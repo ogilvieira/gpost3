@@ -26,8 +26,10 @@ fs.readdirSync(path.join(__dirname, 'schemas/')).forEach(function(filename) {
   var schema = {};
   schema.path = path.join(__dirname, 'schemas/', filename)
   schema.name = filename.replace(/\.[^/.]+$/, "");
+  
   db[schema.name] = require(schema.path)(sequelize, Sequelize);;
 });
+
 
 
 Object.keys(db).forEach(modelName => {

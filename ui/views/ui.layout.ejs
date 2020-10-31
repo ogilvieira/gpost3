@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="has-navbar-fixed-top">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <nav class="navbar is-fixed-top is-dark" role="navigation" aria-label="main navigation" data-vue="navbar" v-cloak>
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/">
+        <img src="/assets/logo.png" width="112" height="28">
+      </a>
+
+      <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample" v-bind:class="{'is-active' : showMenu}" v-on:click="toggleMenu()">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+
+
+    <div id="navbarBasicExample" class="navbar-menu" v-bind:class="{'is-active' : showMenu}">
+      <div class="navbar-start">
+        <a class="navbar-item">
+          Banners
+        </a>
+
+        <a class="navbar-item">
+          Usuários
+        </a>
+
+        <a class="navbar-item">
+          Mídia
+        </a>
+
+        <a class="navbar-item">
+          Configurações
+        </a>
+
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link">
+            Posts
+          </a>
+
+          <div class="navbar-dropdown">
+            <a class="navbar-item">
+              Artigos
+            </a>
+            <a class="navbar-item">
+              Categorias
+            </a>
+            <hr class="navbar-divider">
+            <a class="navbar-item">
+              Configurar
+            </a>
+          </div>
+        </div>
+
+        <a class="navbar-item" href="/api-docs" target="_blank">
+          Docs
+        </a>
+      </div>
+
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <div class="buttons">
+            <a class="button is-primary">
+              <strong>Minha Conta</strong>
+            </a>
+            <a class="button is-light">
+              Sair
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+
+  <div>
+    <%-body%>
+  </div>
+
+  <script src="assets/script.js"></script>
+</body>
+</html>

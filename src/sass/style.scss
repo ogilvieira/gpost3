@@ -1,2 +1,9 @@
 @charset "utf-8";
+@import "vendors/fontawesome.scss";
 @import "../../node_modules/bulma/bulma.sass";
+
+
+[v-cloak] {
+  opacity: 0;
+  pointer-events: none;
+}

@@ -9,22 +9,43 @@
   },
   "author": "",
   "license": "ISC",
+  "browser": {
+    "vue": "vue/dist/vue.common.js"
+  },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.5",
     "dotenv": "^8.2.0",
     "ejs": "^3.1.5",
     "ejs-locals": "^1.0.2",
     "express": "^4.17.1",
+    "express-swagger-generator": "^1.1.17",
+    "jsonwebtoken": "^8.5.1",
+    "memory-cache": "^0.2.0",
     "mysql2": "^2.2.5",
     "sequelize": "^6.3.5",
-    "sequelize-paginate": "^1.1.6"
+    "sequelize-paginate": "^1.1.6",
+    "swagger-ui-express": "^4.1.4"
   },
   "devDependencies": {
+    "@babel/core": "^7.12.3",
+    "@babel/polyfill": "^7.12.1",
+    "@babel/preset-env": "^7.12.1",
+    "babelify": "^10.0.0",
+    "browserify": "^17.0.0",
     "bulma": "^0.9.1",
+    "envify": "^4.1.0",
     "gulp": "^4.0.2",
     "gulp-livereload": "^4.0.2",
     "gulp-nodemon": "^2.5.0",
     "gulp-sass": "^4.1.0",
-    "gulp-wait": "0.0.2"
+    "gulp-sourcemaps": "^2.6.5",
+    "gulp-uglify-es": "^2.0.0",
+    "gulp-wait": "0.0.2",
+    "vinyl-buffer": "^1.0.1",
+    "vinyl-source-stream": "^2.0.0",
+    "vue": "^2.6.12",
+    "vue-toast-notification": "^0.5.4",
+    "vueify": "^9.4.1"
   }
 }

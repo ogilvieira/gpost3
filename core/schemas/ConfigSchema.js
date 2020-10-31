@@ -29,6 +29,5 @@ module.exports = function(sequelize, DataTypes) {
   });
 
   Schema.sync();
-  
   return Schema;
 };
