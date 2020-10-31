@@ -1,0 +1,70 @@
+<% layout('layout') -%>
+<section class="section">
+  <div class="container mb-5 is-max-desktop">
+    <figure style="max-width: 150px;" class="mb-5">
+      <img class="image" src="/assets/logo.png">
+    </figure>
+    <h1 class="title mb-0">Vamos começar</h1>
+    <p class="is-size-5">
+      Preencha os campos abaixo para realizar a instalação e configurações básica do <strong>Gpost</strong>:
+    </p>
+  </div>
+
+  <div class="container is-max-desktop">
+    
+  <form action="/" method="post">
+  
+  <div class="box">
+    <h2 class="subtitle">Configurações do site</h2>
+
+    <div class="field">
+      <label class="label">Nome do site</label>
+      <div class="control">
+        <input class="input" type="text" required minlength="3" value="Teste">
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">URL onde o site esta hospedado.</label>
+      <div class="control">
+        <input class="input" type="url" minlength="12" required value="http://teste.com.br">
+      </div>
+    </div>
+  </div>
+
+  <div class="box">
+    <h2 class="subtitle">Acesso</h2>
+
+    <div class="field">
+      <label class="label">E-mail</label>
+      <div class="control">
+        <input class="input" type="email" placeholder="seu@email.com" value="teste@gmail.com" required>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Senha</label>
+      <div class="control">
+        <input class="input" type="password" autocomplete="new-password" value="Teste" minlength="6">
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Repetir Senha</label>
+      <div class="control">
+        <input class="input" type="password" autocomplete="new-password" value="Teste" minlength="6">
+      </div>
+    </div>
+  </div>
+
+    <div class="control">
+      <button type="button" class="button is-primary is-fullwidth is-large is-uppercase" onclick="validate()">Prosseguir</button>
+    </div>
+  </form>
+  </div>
+</section>
+<script>
+  function validate(e) {
+    return;
+  }
+</script>

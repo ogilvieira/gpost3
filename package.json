@@ -1,0 +1,30 @@
+{
+  "name": "gpost",
+  "version": "3.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start:dev": "gulp watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cookie-parser": "^1.4.5",
+    "dotenv": "^8.2.0",
+    "ejs": "^3.1.5",
+    "ejs-locals": "^1.0.2",
+    "express": "^4.17.1",
+    "mysql2": "^2.2.5",
+    "sequelize": "^6.3.5",
+    "sequelize-paginate": "^1.1.6"
+  },
+  "devDependencies": {
+    "bulma": "^0.9.1",
+    "gulp": "^4.0.2",
+    "gulp-livereload": "^4.0.2",
+    "gulp-nodemon": "^2.5.0",
+    "gulp-sass": "^4.1.0",
+    "gulp-wait": "0.0.2"
+  }
+}
