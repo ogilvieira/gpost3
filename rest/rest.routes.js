@@ -1,19 +1,9 @@
 const express = require('express');
 const router = express.Router();
-
-var Auth = require("./controllers/Auth.Rest.Controller");
-// var User = require("./controllers/User.Admin.Controller");
-// var Account = require("./controllers/Account.Admin.Controller");
-// var Pages = require("./controllers/Pages.Admin.Controller");
-// var PostType = require("./controllers/PostType.Admin.Controller");
-// var Posts = require("./controllers/Posts.Admin.Controller");
-// var Site = require("./controllers/Site.Admin.Controller");
-// var Media = require("./controllers/Media.Admin.Controller");
-// var Forms = require("./controllers/Forms.Admin.Controller");
-// var Custom = require("./controllers/Custom.Admin.Controller");
-// var Taxonomy = require("./controllers/Taxonomy.Admin.Controller");
-// var Relationship = require("./controllers/Relationship.Admin.Controller");
-// var Banners = require("./controllers/Banners.Admin.Controller");
+const jwt = require('jsonwebtoken');
+const { UserSchema } = require('../core/schemas');
+const UserModel = require('../core/models/UserModel');
+const ErrorModel = require('../core/models/ErrorModel');
 
 const mcache = require('memory-cache');
 var cache = (duration) => {
@@ -35,8 +25,54 @@ var cache = (duration) => {
 }
 
 var checkAdmin = (data, req, res, next) => {
-  return (data.user.role != 'admin' && data.user.role != 'dev') ? res.status(401).send("Permission denied.") : next(data);
+  if( !data.userData || data.userData instanceof ErrorModel ) {
+    return res.status(401).send(data.userData instanceof ErrorModel ? data.userData : new ErrorModel());
+  }
+  return (data.userData.role != 'admin' && data.userData.role != 'dev') ? res.status(403).send(new ErrorModel("Usuário sem permissão de acesso.")) : next(data);
 }
+
+const checkAuthorization = async (req, res, next) => {
+  var data = {};
+
+  const token = req.get('Authorization') || req.cookies.token || null;
+
+  if( !token ) { 
+    return next(data); 
+  }
+
+  var jwtCheck = null;
+
+  try {
+    jwtCheck = jwt.verify(token, process.env.SECRET);
+  } catch (err) {
+    data.userData = new ErrorModel("Token expirado.");
+    return next(data);
+  }
+
+  data.userData = await UserSchema.findOne({ where: { id: jwtCheck.id } });
+
+  if(!data.userData){ 
+    data.userData = new ErrorModel("Usuário não encontrado.");
+    return next(data); 
+  }
+
+  data.userData = new UserModel(data.userData);
+
+  if( !data.userData.active ) {
+    return res.end(new ErrorModel("Usuário sem permissão de acesso.")).status(401);
+  }
+
+
+  return next(data);
+}
+
+
+const Account = require("./controllers/Account.Rest.Controller");
+const User = require("./controllers/User.Rest.Controller");
+const Config = require("./controllers/Config.Rest.Controller");
+const Media = require("./controllers/Media.Rest.Controller");
+const Banner = require("./controllers/Banner.Rest.Controller");
+
 
 module.exports = (app) => {
   
@@ -44,18 +80,37 @@ module.exports = (app) => {
     res.status(200).send({});
   });
 
-  router.post('/login', Auth.index);
-  // router.get('/logout', Auth.logout);
 
-  //User
-  // router.route('/user')
-  //   .get(Auth.checkToken, User.index)
-  //   .post(Auth.checkToken, checkAdmin, User.post);
+  router.route("/account")
+    .get(checkAuthorization, Account.get)
+    .put(checkAuthorization, Account.update);
 
-  // router.route('/user/:id')
-  //   .get(Auth.checkToken, checkAdmin, User.get)
-  //   .put(Auth.checkToken, checkAdmin, User.put)
-  //   .delete(Auth.checkToken, checkAdmin, User.delete);
+  router.put('/account/password', checkAuthorization, Account.updatePassword);
+  router.post('/account/login', Account.login);
+
+  router.route("/user")
+    .get(checkAuthorization, User.getAll)
+    .post(checkAuthorization, checkAdmin, User.add);
+
+  router.route("/user/:id")
+    .get(checkAuthorization, checkAdmin, User.get)
+    .put(checkAuthorization, checkAdmin, User.update)
+
+  router.route("/config")
+    .get(Config.getAll);
+
+  router.route("/config/:id")
+    .put(checkAuthorization, checkAdmin, Config.update);
+
+  router.post("/media", checkAuthorization, Media.upload)
+  router.delete("/media/:filename", checkAuthorization, Media.delete)
+
+  router.get("/banner", checkAuthorization, Banner.getAll)
+  router.post("/banner", checkAuthorization, Banner.add)
+
+  router.route("/banner/:id")
+    .get(checkAuthorization, checkAdmin, Banner.get)
+    // .put(checkAuthorization, checkAdmin, User.update)
 
   return router;
 };

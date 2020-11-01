@@ -1,0 +1,109 @@
+<% layout('../ui.layout') -%>
+<section class="hero">
+  <div class="hero-body">
+    <div class="container">
+      
+
+      <div class="columns">
+        
+        <div class="column">
+          <div class="box" data-vue="account" v-cloak>
+            <h2 class="subtitle"><i class="fas fa-id-card mr-2"></i> Dados básicos</h2>
+
+            <div class="field">
+              <label class="label">Nome e Sobrenome <span class="has-text-danger">*</span></label>
+              <div class="control has-icons-left">
+                <span class="icon is-medium is-left">
+                  <i class="fas fa-user-circle"></i>
+                </span>
+                <input class="input" v-model="form.name" type="email" minlength="6" v-bind:class="{'is-danger' : errors && errors.find(a => a.model == 'name')}" :disabled="isProcessing">
+              </div>
+            </div> 
+
+            <div class="field">
+              <label class="label">E-mail <span class="has-text-danger">*</span></label>
+              <div class="control has-icons-left">
+                <span class="icon is-medium is-left">
+                  <i class="fas fa-envelope"></i>
+                </span>
+                <input class="input" v-model="form.email" type="text" minlength="6" v-bind:class="{'is-danger' : errors && errors.find(a => a.model == 'email')}" :disabled="isProcessing">
+              </div>
+            </div> 
+
+            <div class="field">
+              <label class="label">Atribuição</label>
+              <div class="control has-icons-left">
+                <span class="icon is-medium is-left">
+                  <i class="fas fa-briefcase"></i>
+                </span>
+                <input class="input" v-model="form.front_role" type="text" minlength="6" v-bind:class="{'is-danger' : errors && errors.find(a => a.model == 'front_role')}" :disabled="isProcessing">
+              </div>
+            </div> 
+
+            <div class="field">
+              <div class="control">
+                <textarea class="textarea" v-model="form.bio" placeholder="Bio" v-bind:class="{'is-danger' : errors && errors.find(a => a.model == 'bio')}" :disabled="isProcessing"></textarea>
+              </div>
+
+            </div> 
+
+
+
+            <div v-if="errors && errors.length" class="notification is-danger">
+              <button class="delete" v-on:click="errors = []"></button>
+              <p v-for="error in errors" v-text="error.message"></p>
+            </div>
+
+            <div class="control">
+              <button type="button" class="button is-info is-primary is-fullwidth" :disabled="isProcessing" v-bind:class="{'is-loading' : isProcessing }" v-on:click="checkForm">Atualizar Dados</button>
+            </div>
+
+          </div>
+        </div>
+
+
+        <div class="column" data-vue="account-password" v-cloak>
+          <div class="box">
+            <h2 class="subtitle"><i class="fas fa-key mr-2"></i> Acesso</h2>
+         
+            <div class="field">
+              <label class="label">Senha atual</label>
+              <div class="control">
+                <input class="input" v-model="form.currentPassword" type="password" autocomplete="new-password" minlength="6" v-bind:class="{'is-danger' : errors && errors.find(a => a.model == 'currentPassword')}" :disabled="isProcessing">
+              </div>
+            </div> 
+
+            <div class="field">
+              <label class="label">Nova Senha</label>
+              <div class="control">
+                <input v-on:keyup="setScore()" class="input" v-model="form.newPassword" type="password" autocomplete="new-password" minlength="6" v-bind:class="{'is-danger' : errors && errors.find(a => a.model == 'newPassword')}" :disabled="isProcessing">
+              </div>
+            </div> 
+
+            <progress v-if="form.newPassword.length > 0" class="progress is-small" v-bind:class="{'is-danger' : score < 50, 'is-warning': score >= 50 && score < 70, 'is-success' : score > 70 }" :value="score" max="100" v-text="score"></progress>
+
+            <div class="field">
+              <label class="label">Repetir nova Senha</label>
+              <div class="control">
+                <input class="input" v-model="form.newPasswordB" type="password" autocomplete="new-password" minlength="6" v-bind:class="{'is-danger' : errors && errors.find(a => a.model == 'newPasswordB')}" :disabled="isProcessing">
+              </div>
+            </div> 
+
+
+            <div v-if="errors && errors.length" class="notification is-danger">
+              <button class="delete" v-on:click="errors = []"></button>
+              <p v-for="error in errors" v-text="error.message"></p>
+            </div>
+
+            <div class="control">
+              <button type="button" class="button is-info is-primary is-fullwidth" :disabled="isProcessing" v-bind:class="{'is-loading' : isProcessing }" v-on:click="checkForm">Atualizar Senha</button>
+            </div>
+
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>

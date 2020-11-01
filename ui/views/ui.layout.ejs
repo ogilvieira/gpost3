@@ -1,16 +1,22 @@
 <!DOCTYPE html>
-<html lang="pt-br" class="has-navbar-fixed-top">
+<html lang="pt-br" class="<%= SITE.showNavBar ? 'has-navbar-fixed-top' : '' %>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-  <link rel="stylesheet" href="assets/style.css">
+  <title><%= SITE.title ? SITE.title + ' - ' + SITE.sitename : SITE.sitename %></title>
+  <link rel="stylesheet" href="<%=SITE.base_url%>/assets/style.css">
 </head>
 <body>
-  <nav class="navbar is-fixed-top is-dark" role="navigation" aria-label="main navigation" data-vue="navbar" v-cloak>
+
+  <% if(SITE.showNavBar) { %>
+  <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation" data-vue="navbar" v-cloak>
     <div class="navbar-brand">
       <a class="navbar-item" href="/">
+        <% if(!SITE.config.sitelogo) { %>
         <img src="/assets/logo.png" width="112" height="28">
+        <% } else { %>
+        <img src="<%=SITE.config.sitelogo%>" width="112" height="28">
+        <% } %>
       </a>
 
       <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample" v-bind:class="{'is-active' : showMenu}" v-on:click="toggleMenu()">
@@ -23,20 +29,14 @@
 
     <div id="navbarBasicExample" class="navbar-menu" v-bind:class="{'is-active' : showMenu}">
       <div class="navbar-start">
-        <a class="navbar-item">
-          Banners
+        
+
+        <a href="/users" class="navbar-item">
+          <i class="mr-1 fas fa-users"></i> Usuários
         </a>
 
-        <a class="navbar-item">
-          Usuários
-        </a>
-
-        <a class="navbar-item">
-          Mídia
-        </a>
-
-        <a class="navbar-item">
-          Configurações
+        <a href="/banners" class="navbar-item">
+          <i class="mr-1 fas fa-file-image"></i> Banners
         </a>
 
         <div class="navbar-item has-dropdown is-hoverable">
@@ -45,44 +45,71 @@
           </a>
 
           <div class="navbar-dropdown">
-            <a class="navbar-item">
+            <a href="/articles/posts" class="navbar-item">
               Artigos
             </a>
-            <a class="navbar-item">
+            <a href="/articles/posts/categories" class="navbar-item">
               Categorias
             </a>
             <hr class="navbar-divider">
-            <a class="navbar-item">
+            <a href="/articles/posts/edit" class="navbar-item">
               Configurar
             </a>
           </div>
         </div>
 
         <a class="navbar-item" href="/api-docs" target="_blank">
-          Docs
+          <i class="mr-1 fas fa-file-code"></i> Docs
         </a>
+
+        <a href="/config" class="navbar-item">
+          <i class="mr-1 fas fa-cog"></i> Configurações
+        </a>
+
+        <a href="<%=SITE.config.siteurl%>" target="_blank" class="navbar-item has-text-info">
+          <small><%=SITE.config.sitename%> <i class="ml-1 fas fa-external-link-alt"></i></small>
+        </a>
+
       </div>
 
       <div class="navbar-end">
         <div class="navbar-item">
           <div class="buttons">
-            <a class="button is-primary">
+            <a href="/account" class="button is-primary">
+              <i class="mr-2 fas fa-user"></i>
               <strong>Minha Conta</strong>
             </a>
-            <a class="button is-light">
+            <button v-on:click="logout()" class="button is-light">
               Sair
-            </a>
+              <i class="ml-1 fas fa-sign-out-alt"></i>
+            </button>
           </div>
         </div>
       </div>
     </div>
   </nav>
+  <% } %>
 
 
-  <div>
+  <section>
+    <% if(SITE.showTitleBar && SITE.title) { %>
+    <section class="hero is-light">
+      <div class="hero-body pt-4 pb-4">
+        <div class="container">
+          <h1 class="title">
+            <%=SITE.title %>
+          </h1>
+          <% if( SITE.description ) { %>
+          <h2 class="subtitle"><%=SITE.description %></h2>
+          <% } %>
+        </div>
+      </div>
+    </section>
+    <% } %>
+
     <%-body%>
-  </div>
+  </section>
 
-  <script src="assets/script.js"></script>
+  <script src="<%=SITE.base_url%>/assets/script.js"></script>
 </body>
 </html>

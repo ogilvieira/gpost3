@@ -1,0 +1,82 @@
+<% layout('../ui.layout') -%>
+<section class="hero" data-vue="banner-items" v-cloak>
+  <div class="hero-body">
+    <div class="container">
+      
+      <hr class="mt-0 mb-3">
+
+    <draggable v-model="data" dragable=".box">
+      <transition-group>
+        <div class="box" v-for="item in data" :key="item.order">
+          <div class="columns is-flex-wrap-wrap is-align-items-center">
+            
+            <div class="column is-3"> 
+              <input-image v-model="item.image"></input-image>
+            </div>
+
+            <div class="column is-4">
+
+              <div class="field">
+                <div class="control">
+                  <input class="input is-small" v-model="item.title" placeholder="Titulo" type="text" minlength="6" v-bind:class="{'is-danger' : errors && errors.find(a => a.model == 'title')}" :disabled="isProcessing || userInfo && userInfo.role == 'editor'" required>
+                </div>
+              </div> 
+
+              <div class="field">
+                <div class="control has-icons-left">
+                  <span class="icon is-small is-left">
+                    <i class="fas fa-link"></i>
+                  </span>
+                  <input class="input" v-model="item.link" placeholder="Link" pattern="https://.*" type="url" minlength="6" v-bind:class="{'is-danger' : errors && errors.find(a => a.model == 'title')}" :disabled="isProcessing || userInfo && userInfo.role == 'editor'" required>
+                </div>
+              </div> 
+
+            </div>
+
+            <div class="column is-3">
+              
+            <div class="field is-horizontal">
+              <div class="field-label is-small">
+                <label class="label">De</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <p class="control">
+                    <input v-model="item.start" class="input is-small" type="datetime-local" placeholder="Recipient email">
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="field is-horizontal">
+              <div class="field-label is-small">
+                <label class="label">Até</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <p class="control">
+                    <input v-model="item.end" class="input is-small" type="datetime-local" placeholder="Recipient email">
+                    <small class="is-size-7 has-text-grey-light"><i class="fas fa-exclamation-circle mr-1"></i> Deixe em branco para Infinito</small>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+
+
+            </div>
+
+            <div class="column is-2 has-text-right">
+              <button class="button is-warning" title="Ordernar"><i class="fas fa-arrows-alt-v"></i></button>
+            </div>
+          </div>
+        </div>
+      </transition-group>
+
+    </draggable>
+
+    <button slot="footer" class="button mt-2 is-success"><span class="icon"><i class="fa fa-plus-circle"></i></span> <span>Adicionar Novo</span></button>
+
+    </div>
+  </div>
+</section>

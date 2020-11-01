@@ -8,18 +8,18 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false
     },
-    content_type: {
+    description: {
+      type: DataTypes.STRING
+    },
+    system: {
       type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: 'article'
+      defaultValue: 'ARTICLE'
     },
     show_in_search: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: true
-    },
-    description: {
-      type: DataTypes.STRING
     },
     cover: {
       type: DataTypes.STRING

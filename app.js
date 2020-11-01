@@ -8,6 +8,7 @@ const schemas = require("./core/schemas");
 const path    = require('path');
 const fs = require('fs');
 const pjson = require('./package.json');
+const fileUpload = require('express-fileupload');
 
 var isInstall = false;
 
@@ -35,12 +36,17 @@ app.set('trust proxy', true);
 //set static files
 app.use(express.static(path.join(__dirname, '/public')));
 
+//set config of uploads
+app.use(fileUpload({
+  limits: { fileSize: 600 * 1024 }
+}));
+
 
 var BASE_URL = "";
 
 //set common middleware
 app.use((req, res, next) => {
-  let port = process.env.PORT || 3000;
+  let port = process.env.PORT || 8080;
 
   if(req.url.endsWith('.jpg') || 
     req.url.endsWith('.jpeg') || 
@@ -75,10 +81,11 @@ let optionsSwagger = {
       version: pjson.version,
     },
     host: `localhost:${app.get('port')}`,
-    basePath: '/rest',
+    basePath: '/',
     produces: [
     "application/json",
-    "application/xml"
+    "application/xml",
+    "multipart/form-data"
     ],
     schemes: ['http', 'https'],
     securityDefinitions: {
@@ -91,11 +98,10 @@ let optionsSwagger = {
     }
   },
   basedir: __dirname, //app absolute path
-  files: ['./rest/**/*.js'] //Path to the API handle folder
+  files: ['./rest/**/*.js', './core/models/**/*.js'] //Path to the API handle folder
 };
 
 expressSwagger(optionsSwagger);
-
 
 //start server
 const server = http.createServer(app);

@@ -1,4 +1,4 @@
-exports.index = async (req, res) => {
+exports.index = async (data, req, res, next) => {
 
-  res.render('index');
+  res.render('index', data);
 }

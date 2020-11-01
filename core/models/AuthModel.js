@@ -1,86 +1,61 @@
 var { UserSchema } = require('../../core/schemas');
-
-var UserModel = require('./UserModel');
+var ErrorModel = require('./ErrorModel');
 var bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+
+/**
+ * @typedef Auth
+ * @property {string} email.required
+ * @property {string} password.required
+ */
 
 function Model(email = null, password = null, token = null) {
   this.email = email;
   this.password = password;
-  this.token = token;
-  this.user = null;
+}
+
+Model.prototype.checkPassword = function(password, encryptedPassword) {
+  return bcrypt.compareSync(password, encryptedPassword);
 }
 
 Model.prototype.run = async function() {
-  return new Promise(resolve => {
     
-    UserSchema.findOne({ where: { email: this.email }}).then( user => {
+    return UserSchema.findOne({ where: { email: this.email }}).then( async user => {
 
-      if( !user ) return resolve({
-        message: 'Usuário não encontrado.',
-        data: null,
-        token: null
+      if( !user ) throw new ErrorModel(null, {
+        email: "Usuário inválido"
       });
 
-      var user = new UserModel(user);
-
-      var isActive = user.isActive();
-
-      if(!isActive) {
-        return resolve({
-          message: "Sem permissão de acesso.",
-          data: null,
-          token: null
-        });
+      if(!user.active) {
+        throw new ErrorModel("Sem permissão de acesso");
       }
 
-      var isMatch = user.validPassword(this.password);
+      var isMatch = this.checkPassword(this.password, user.password);
 
       if( !isMatch ){
-        return resolve({
-          message: "Senha inválida.",
-          data: null,
-          token: null,
-          user: null
-        });
+        throw (new ErrorModel(null, {
+            "password" : "Senha inválida"
+          }
+        ));
       }
 
-      var token = jwt.sign({ id: user.data.id }, process.env.SECRET, {
-        expiresIn: 3.024e+6 // expires in 5 week
+      var token = jwt.sign({ id: user.id }, process.env.SECRET, {
+        expiresIn: 21600 // expires in 6h 
       });
 
-      return resolve({
-        message: "Usuário e senha válidos!",
-        data: null,
-        user: user.getUser(),
-        token: token
-      })
+      await UserSchema.update({ last_access: new Date() }, { where: { id: user.id }});
 
+      return token;
+
+    }).catch(err => {
+      throw err;
     });
-
-  })
 };
 
-Model.prototype.checkToken = async function(token) {
-  if (!token) return false;
-  this.token = token
-  var decoded = null;
-
-  try {
-    decoded = jwt.verify(this.token, process.env.SECRET);
-  } catch( err ){
-    if(err) return false;
-  } 
-
-  var user = new UserModel();
-  await user.get(decoded.id);
-  
-  return {
-    token: this.token,
-    data: null,
-    message: null,
-    user: user.getUser()      
-  }
+Model.prototype.encryptPass = function( password ) {
+  const salt = bcrypt.genSaltSync();
+  password = bcrypt.hashSync(password, salt);
+  return password;
 }
 
 module.exports = Model;

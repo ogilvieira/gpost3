@@ -19,17 +19,13 @@ const sequelize = new Sequelize(process.env.MYSQL_DATABASE, process.env.MYSQL_US
   }
 });
 
-
 var db = {};
-
 fs.readdirSync(path.join(__dirname, 'schemas/')).forEach(function(filename) {
   var schema = {};
   schema.path = path.join(__dirname, 'schemas/', filename)
   schema.name = filename.replace(/\.[^/.]+$/, "");
-  
   db[schema.name] = require(schema.path)(sequelize, Sequelize);;
 });
-
 
 
 Object.keys(db).forEach(modelName => {

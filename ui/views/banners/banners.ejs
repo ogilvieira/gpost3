@@ -1,0 +1,38 @@
+<% layout('../ui.layout') -%>
+<section class="hero" data-vue="banner-list" v-cloak>
+  <div class="hero-body">
+    <div class="container">
+      
+      <div class="columns has-text-right">
+        <div class="column">
+          <a href="/banners/new" class="button is-warning">
+            <span class="icon">
+              <i class="fas fa-plus-square"></i>
+            </span>
+            <span>Novo</span>
+          </a>
+        </div>
+      </div>
+
+      <hr class="mt-0 mb-3">
+
+      <div class="columns is-flex-wrap-wrap">
+        <div class="column is-3" v-for="area in data"> 
+          <div class="box">
+            <div><i class="fas fa-images mr-2 has-text-info"></i><strong v-text="area.title"></strong></div>
+            <p class="is-size-7 has-text-grey-light" v-text="area.description"></p>
+            <code class="is-size-7"><i class="fas fa-code mr-1"></i> <span v-text="area.slug">/home</span></code>
+
+            <div class="columns mt-2">
+              <div class="column">
+                <a :href="'/banners/'+area.id" class="button is-rounded is-small"><i class="fas fa-edit mr-2"></i> Editar</a>
+                <a :href="'/banners/'+area.id+'/items'" class="button is-rounded is-small is-info"><i class="fas fa-table mr-2"></i> Itens</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>

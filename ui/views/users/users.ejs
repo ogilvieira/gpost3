@@ -1,0 +1,68 @@
+<% layout('../ui.layout') -%>
+<section class="hero" data-vue="user-list" v-cloak>
+  <div class="hero-body">
+    <div class="container">
+
+      <div class="columns has-text-right">
+        <div class="column">
+          <a href="/users/new" class="button is-warning">
+            <span class="icon">
+              <i class="fas fa-plus-square"></i>
+            </span>
+            <span>Novo</span>
+          </a>
+        </div>
+      </div>
+
+      <hr class="mt-0 mb-3">
+
+      <div class="columns" v-if="isProcessing">
+        <div class="column">
+          <div class="box is-size-6"> <i class="fas fa-sync-alt fa-spin mr-2"></i> Carregando...</div>
+        </div>
+      </div>
+
+      <div class="columns" v-if="!isProcessing && (!data || !data.docs || !data.docs.length)">
+        <div class="column">
+          <div class="notification">
+            Nenhum item encontrado.
+            <button class="button is-rounded is-small" v-on:click="fetchInfo()">
+              <span class="icon">
+                <i class="fas fa-sync-alt"></i>
+              </span>
+              <span>
+                Tentar Novamente
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="columns is-flex-wrap-wrap" v-if="data && data.docs && data.docs.length">
+        
+        <div class="column is-one-quarter"  v-for="item in data.docs">
+          <a :href="'/users/'+item.id" class="box">
+            <div class="is-size-7 is-uppercase" v-text="item.role"></div>
+            <div><strong v-text="item.name"></strong> </div>
+            <div class="columns is-align-items-center">
+              <div class="column has-text-grey-light is-size-7">
+                <i class="fas fa-clock mr-1"></i> <span v-text="item.last_accessText"></span> 
+              </div>
+              <div class="column has-text-right">
+                <span class="tag is-small is-rounded mr-1" v-bind:class="{'is-success' : item.active, 'is-danger' : !item.active }" v-text="item.active ? 'Ativo' : 'Desativado'"></span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+      </div>
+
+      <nav class="pagination is-small" role="navigation" aria-label="pagination" v-if="data && data.pages > 1">
+        <a href="javascript:void(0);" class="pagination-previous" v-on:click="fetchInfo(data.page-1)" :disabled="page == 1" title="This is the first page">Anterior</a>
+        <a href="javascript:void(0);" v-on:click="fetchInfo(data.page+1)" class="pagination-next" :disabled="data.total >= page">Próxima</a>
+      </nav>
+
+    </div>
+  </div>
+</section>
