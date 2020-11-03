@@ -54,7 +54,7 @@ function scripts() {
     )
     .transform(
       babel.configure({
-        presets: ["@babel/preset-env"],
+        presets: ["@babel/preset-env"]
       })
     )
     .bundle()
@@ -96,13 +96,13 @@ function watch() {
     execMap: {
       js: "node",
     },
-    watch: ["core/**/*", "install/**/*", "rest/**/*", "ui/**/*"],
+    watch: ["app.js","AuthGuard.js", "core/**/*", "install/**/*", "rest/**/*", "ui/**/*"],
     events: {
       start: "echo 'Server started'",
       restart: "echo 'Server started'",
       crash: "echo 'Server failed to start :((((((((((((((('",
     },
-    ext: "js",
+    ext: "js,ejs",
   });
 
   buildDev();

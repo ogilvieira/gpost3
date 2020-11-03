@@ -45,12 +45,6 @@ if( document.querySelector("[data-vue=login]") ) {
           })
 
       },
-    },
-    created: function(){
-     if( window.localStorage.getItem("token") ) {
-      window.location.href = "/";
-      this.isProcessing = true;
-     }
     }
   });
 

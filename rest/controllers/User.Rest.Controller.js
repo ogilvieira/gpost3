@@ -106,6 +106,11 @@ exports.update = async (data, req, res, next) => {
     active: req.body.active || 0
   };
 
+  //disale auto-update status
+  if(data.userData.id == id ) {
+    delete newUserData.active;
+  }
+
   if(!['admin','dev','editor'].find(a => newUserData.role)){
     newUserData.role = 'editor';
   }

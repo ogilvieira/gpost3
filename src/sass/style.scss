@@ -1,6 +1,5 @@
 @charset "utf-8";
 @import "vendors/fontawesome.scss";
-@import "vendors/vue-wysiwyg.scss";
 @import "../../node_modules/bulma/bulma.sass";
 @import "../../node_modules/vue-toast-notification/dist/theme-sugar";
 
@@ -15,6 +14,17 @@
   border-radius: 5px;
   background: whitesmoke;
 
+  .image {
+    min-height: 106px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    img { transition: transform .1s linear; }
+  }
+
+  &:hover .image img {
+    transform: scale(1.1);
+  }
 
   .delete {
     position: absolute;
@@ -28,4 +38,26 @@
   opacity: .3;
   box-shadow: none;
   background: whitesmoke;
+}
+
+
+.select {
+  width: 100%;
+  display: block;
+
+  select { width: 100%; }
+}
+
+// .ck .media { display: block; }
+
+.ck-content {
+  @extend .content;
+}
+
+.is-movable {
+  cursor: move;
+}
+
+.ck.ck-sticky-panel .ck-sticky-panel__content_sticky {
+  top: 52px !important;
 }

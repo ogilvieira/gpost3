@@ -91,7 +91,7 @@
                       <select v-model="form.role" :disabled="isProcessing || userInfo && userInfo.role == 'editor'" v-bind:class="{'is-danger' : errors && errors.find(a => a.model == 'role')}">
                         <option value="editor">Editor</option>
                         <option value="admin">Administrador</option>
-                        <option value="dev" v-if="userInfo && userInfo.role =='dev'">Desenvolvedor</option>
+                        <option value="dev">Desenvolvedor</option>
                       </select>
                     </div>
                   </div>

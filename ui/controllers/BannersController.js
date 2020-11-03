@@ -4,7 +4,7 @@ exports.index = async (data, req, res, next) => {
 }
 
 exports.edit = async (data, req, res, next) => {
-  data.SITE.title = "Editar área de banners";
+  data.SITE.title = "Configurar área de banners";
   data.areaID = req.params.id;
   return res.render('banners/banners-edit', data);
 }
@@ -17,6 +17,7 @@ exports.add = async (data, req, res, next) => {
 
 exports.detail = async (data, req, res, next) => {
   data.SITE.title = "Itens do banner";
-  data.areaID = "";
+  data.areaID = req.params.id;
+  
   return res.render('banners/banners-items', data);
 }

@@ -1,9 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
-const { UserSchema } = require('../core/schemas');
-const UserModel = require('../core/models/UserModel');
-const ErrorModel = require('../core/models/ErrorModel');
 
 const mcache = require('memory-cache');
 var cache = (duration) => {
@@ -24,49 +20,7 @@ var cache = (duration) => {
   }
 }
 
-var checkAdmin = (data, req, res, next) => {
-  if( !data.userData || data.userData instanceof ErrorModel ) {
-    return res.status(401).send(data.userData instanceof ErrorModel ? data.userData : new ErrorModel());
-  }
-  return (data.userData.role != 'admin' && data.userData.role != 'dev') ? res.status(403).send(new ErrorModel("Usuário sem permissão de acesso.")) : next(data);
-}
-
-const checkAuthorization = async (req, res, next) => {
-  var data = {};
-
-  const token = req.get('Authorization') || req.cookies.token || null;
-
-  if( !token ) { 
-    return next(data); 
-  }
-
-  var jwtCheck = null;
-
-  try {
-    jwtCheck = jwt.verify(token, process.env.SECRET);
-  } catch (err) {
-    data.userData = new ErrorModel("Token expirado.");
-    return next(data);
-  }
-
-  data.userData = await UserSchema.findOne({ where: { id: jwtCheck.id } });
-
-  if(!data.userData){ 
-    data.userData = new ErrorModel("Usuário não encontrado.");
-    return next(data); 
-  }
-
-  data.userData = new UserModel(data.userData);
-
-  if( !data.userData.active ) {
-    return res.end(new ErrorModel("Usuário sem permissão de acesso.")).status(401);
-  }
-
-
-  return next(data);
-}
-
-
+const AuthGuard = require("../AuthGuard");
 const Account = require("./controllers/Account.Rest.Controller");
 const User = require("./controllers/User.Rest.Controller");
 const Config = require("./controllers/Config.Rest.Controller");
@@ -82,35 +36,45 @@ module.exports = (app) => {
 
 
   router.route("/account")
-    .get(checkAuthorization, Account.get)
-    .put(checkAuthorization, Account.update);
+    .get(AuthGuard.checkAuthorization, Account.get)
+    .put(AuthGuard.checkAuthorization, Account.update);
 
-  router.put('/account/password', checkAuthorization, Account.updatePassword);
+  router.put('/account/password', AuthGuard.checkAuthorization, Account.updatePassword);
   router.post('/account/login', Account.login);
 
   router.route("/user")
-    .get(checkAuthorization, User.getAll)
-    .post(checkAuthorization, checkAdmin, User.add);
+    .get(AuthGuard.checkAuthorization, User.getAll)
+    .post(AuthGuard.checkAuthorization, AuthGuard.checkAdmin, User.add);
 
   router.route("/user/:id")
-    .get(checkAuthorization, checkAdmin, User.get)
-    .put(checkAuthorization, checkAdmin, User.update)
+    .get(AuthGuard.checkAuthorization, AuthGuard.checkAdmin, User.get)
+    .put(AuthGuard.checkAuthorization, AuthGuard.checkAdmin, User.update)
 
   router.route("/config")
     .get(Config.getAll);
 
   router.route("/config/:id")
-    .put(checkAuthorization, checkAdmin, Config.update);
+    .put(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, Config.update);
 
-  router.post("/media", checkAuthorization, Media.upload)
-  router.delete("/media/:filename", checkAuthorization, Media.delete)
+  router.post("/media", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Media.upload)
+  router.delete("/media/:filename", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Media.delete)
 
-  router.get("/banner", checkAuthorization, Banner.getAll)
-  router.post("/banner", checkAuthorization, Banner.add)
+  router.get("/banner", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Banner.getAll)
+  router.post("/banner", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Banner.add)
 
   router.route("/banner/:id")
-    .get(checkAuthorization, checkAdmin, Banner.get)
-    // .put(checkAuthorization, checkAdmin, User.update)
+    .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, Banner.get)
+    .put(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, Banner.update)
+
+  router.route("/banner/:id/items")
+    .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Banner.getItems)
+
+  router.route("/banner/:id/item/:itemID")
+    .put(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Banner.updateItem)
+    .delete(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Banner.deleteItem)
+
+  router.route("/banner/:id/item/new")
+    .post(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Banner.addItem)
 
   return router;
 };

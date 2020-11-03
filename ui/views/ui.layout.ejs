@@ -6,10 +6,10 @@
   <title><%= SITE.title ? SITE.title + ' - ' + SITE.sitename : SITE.sitename %></title>
   <link rel="stylesheet" href="<%=SITE.base_url%>/assets/style.css">
 </head>
-<body>
+<body class="pb-5">
 
   <% if(SITE.showNavBar) { %>
-  <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation" data-vue="navbar" v-cloak>
+  <nav class="navbar is-fixed-top has-background-light" role="navigation" aria-label="main navigation" data-vue="navbar" v-cloak>
     <div class="navbar-brand">
       <a class="navbar-item" href="/">
         <% if(!SITE.config.sitelogo) { %>
@@ -31,9 +31,11 @@
       <div class="navbar-start">
         
 
+        <% if (userData && (userData.role == 'dev' || userData.role == 'admin')) { %>
         <a href="/users" class="navbar-item">
           <i class="mr-1 fas fa-users"></i> Usuários
         </a>
+        <% } %>
 
         <a href="/banners" class="navbar-item">
           <i class="mr-1 fas fa-file-image"></i> Banners
@@ -48,23 +50,23 @@
             <a href="/articles/posts" class="navbar-item">
               Artigos
             </a>
-            <a href="/articles/posts/categories" class="navbar-item">
-              Categorias
-            </a>
             <hr class="navbar-divider">
             <a href="/articles/posts/edit" class="navbar-item">
               Configurar
             </a>
           </div>
         </div>
-
+        <% if (userData && userData.role == 'dev') { %>
         <a class="navbar-item" href="/api-docs" target="_blank">
           <i class="mr-1 fas fa-file-code"></i> Docs
         </a>
+        <% } %>
 
+        <% if (userData && (userData.role == 'dev' || userData.role == 'admin')) { %>
         <a href="/config" class="navbar-item">
           <i class="mr-1 fas fa-cog"></i> Configurações
         </a>
+        <% } %>
 
         <a href="<%=SITE.config.siteurl%>" target="_blank" class="navbar-item has-text-info">
           <small><%=SITE.config.sitename%> <i class="ml-1 fas fa-external-link-alt"></i></small>
@@ -77,12 +79,12 @@
           <div class="buttons">
             <a href="/account" class="button is-primary">
               <i class="mr-2 fas fa-user"></i>
-              <strong>Minha Conta</strong>
+              <strong><%= userData ? userData.acron : "Minha Conta"%></strong>
             </a>
-            <button v-on:click="logout()" class="button is-light">
+            <a href="/logout" class="button is-light">
               Sair
               <i class="ml-1 fas fa-sign-out-alt"></i>
-            </button>
+            </a>
           </div>
         </div>
       </div>

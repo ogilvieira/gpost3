@@ -1,10 +1,12 @@
 const { ConfigSchema } = require("../../core/schemas.js");
 const AuthModel = require("../../core/models/AuthModel.js");
+const UserModel = require("../../core/models/UserModel.js");
 
 require("dotenv").config();
 
-exports.index = async (req, res, next) => {
-  var data = {};
+exports.index = async (data, req, res, next) => {
+  var data = data || {};
+      data.userData = data.userData ? new UserModel(data.userData) : null;
 
   data.SITE = {
     sitename: "GPost",

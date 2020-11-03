@@ -32,12 +32,14 @@
     "sequelize-paginate": "^1.1.6",
     "slugify": "^1.4.6",
     "swagger-ui-express": "^4.1.4",
-    "vue-wysiwyg": "^1.7.2"
+    "moment": "^2.29.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",
     "@babel/polyfill": "^7.12.1",
     "@babel/preset-env": "^7.12.1",
+    "@ckeditor/ckeditor5-build-classic": "^23.1.0",
+    "@ckeditor/ckeditor5-vue": "^1.0.3",
     "axios": "^0.21.0",
     "babelify": "^10.0.0",
     "browserify": "^17.0.0",
@@ -50,7 +52,6 @@
     "gulp-sourcemaps": "^2.6.5",
     "gulp-uglify-es": "^2.0.0",
     "gulp-wait": "0.0.2",
-    "moment": "^2.29.1",
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0",
     "vue": "^2.6.12",

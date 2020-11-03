@@ -9,31 +9,47 @@ const Banners = require('./controllers/BannersController.js');
 const Users = require('./controllers/UsersController.js');
 const Config = require('./controllers/ConfigController.js');
 const Articles = require('./controllers/ArticlesController.js');
+const AuthGuard = require("../AuthGuard");
 
 module.exports = (app) => {
 
-  router.get('/login', Base.index, Login.index);
+  router.get('/login', (req, res, next) => { 
+    if( req.cookies.token ) {
+      return res.redirect('/');
+    }
 
-  router.get('/', Base.index, Home.index);
-  router.get('/account', Base.index, Account.index);
+    return next({}); 
+  }, Base.index, Login.index);
 
-  router.get('/users', Base.index, Users.index);
-  router.get('/users/new', Base.index, Users.add);
-  router.get('/users/:id', Base.index, Users.edit);
+  router.get('/', AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Home.index);
+  router.get('/account', AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Account.index);
 
-  router.get('/banners', Base.index, Banners.index);
-  router.get('/banners/new', Base.index, Banners.add);
-  router.get('/banners/:id', Base.index, Banners.edit);
-  router.get('/banners/:id/items', Base.index, Banners.detail);
+  router.get('/users', AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Users.index);
+  router.get('/users/new', AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Users.add);
+  router.get('/users/:id', AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Users.edit);
+
+  router.get('/banners', AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Banners.index);
+  router.get('/banners/new', AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, Base.index, Banners.add);
+  router.get('/banners/:id', AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Banners.edit);
+  router.get('/banners/:id/items', AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Banners.detail);
 
 
-  router.get("/articles/:posttype/", Base.index, Articles.index);
-  router.get("/articles/:posttype/edit", Base.index, Articles.edit);
-  router.get("/articles/:posttype/categories", Base.index, Articles.categories);
-  router.get("/articles/:posttype/new", Base.index, Articles.postNew);
-  router.get("/articles/:posttype/:post", Base.index, Articles.postEdit);
+  router.get("/articles/:posttype/", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Articles.index);
+  router.get("/articles/:posttype/edit", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Articles.edit);
+  router.get("/articles/:posttype/categories", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Articles.categories);
+  router.get("/articles/:posttype/new", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Articles.postNew);
+  router.get("/articles/:posttype/:post", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Articles.postEdit);
 
-  router.get('/config', Base.index, Config.index)
+  router.get('/config', AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Config.index)
+
+  router.get('/api-docs', AuthGuard.checkAuthorization, AuthGuard.checkToBlock, (data, req, res, next) => {
+    return data.userData.role == 'dev' ? next() : res.redirect('/');
+  })
+
+  router.get('/logout', (req, res) => {
+    res.clearCookie('token');
+    res.redirect('/login');
+  })
 
   return router;
 };

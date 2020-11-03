@@ -59,8 +59,6 @@ if( document.querySelector("[data-vue=banner-edit]") ) {
           this.errors.push({ model: "description", message: "Descrição inválidas."});
         }
 
-
-
         if( this.MODE == 'edit' && JSON.stringify(this.form) == JSON.stringify(this.formRef) ) {
           this.errors.push({ model: "", message: "Não há atualizações para realizar." })
         }
@@ -90,6 +88,7 @@ if( document.querySelector("[data-vue=banner-edit]") ) {
 
           })
           .catch( response => {
+            console.log(response);
             if( response.models ) {
               Object.keys(response.models).map(a => {
                 this.errors.push({ model: a, message: response.models[a] })

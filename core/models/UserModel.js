@@ -20,6 +20,7 @@ function User(data) {
   this.front_role = data.front_role || "";
   this.email = data.email || null;
   this.name = data.name || null;
+  this.acron = null;
   this.bio = data.bio || "";
   this.last_access = data.last_access || null;
   this.last_accessText = data.last_access ? moment(this.last_access).fromNow() : null;
@@ -27,6 +28,44 @@ function User(data) {
   this.updatedAt = data.updatedAt || null;
   this.role = data.role || 'editor';
   this.active = data.active;
+
+
+  if( this.name ) {
+    let acron = [];
+
+    let nameArr = this.name.split(' ');
+
+    //remove preposições
+    nameArr = nameArr.filter( a => {
+      let str = a.toLowerCase();
+
+      switch(str) {
+        case 'de':
+        case 'da':
+        case 'do':
+        case 'dos':
+          return false;
+        break;
+        default:
+          return true;
+      }
+
+    })
+
+
+    nameArr.map( a => {
+      if( a.split('')[0] ){
+        acron.push(a.split('')[0]);
+      }
+    });
+
+    if( acron.length < 2 ) {
+      acron = this.name.slice(0, 2);
+    } else {
+      this.acron = acron.slice(0, 2).join('').toUpperCase();
+    }
+
+  }
 
   return this;
 }

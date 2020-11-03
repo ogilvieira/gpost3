@@ -41,7 +41,7 @@
             </div> 
           </div>
           <div class="column" v-if="config.key_type == 'IMAGE'">
-            <input-image v-model="config.key_value" :disabled="userInfo && userInfo.role == 'editor'" v-on:change="updateKey($event, config)"></input-image>
+            <input-image v-model="config.key_value" :disabled="userInfo && userInfo.role == 'editor'" v-on:deleteupload="updateKey($event, config)"></input-image>
           </div>
           <div class="column" v-if="config.key_type == 'BOOLEAN'">
             <div class="select">
@@ -51,8 +51,8 @@
               </select>
             </div>
           </div>
-          <div class="column has-text-right" v-if="config.key_type != 'IMAGE'">
-            <button class="button is-small is-success" v-on:click="updateKey($event, config)" type="button" :disabled="userInfo && userInfo.role == 'editor'">
+          <div class="column has-text-right">
+            <button class="button is-small is-success" v-on:click="updateKey($event, config)" type="button" :disabled="userInfo && userInfo.role == 'editor' || isProcessing" v-bind:class="{'is-loading' : isProcessing }">
               <i class="mr-2 fas fa-save"></i>
               <span>Salvar</span>
             </button>

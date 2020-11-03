@@ -23,9 +23,17 @@
         </div>
       </div>
 
+      <div class="columns" v-if="userInfo && userInfo.role == 'editor'">
+        <div class="column">
+          <div class="notification is-danger">
+            <i class="fa fa-exclamation-circle mr-1"></i> A edição não é permitida para este item.
+          </div>
+        </div>
+      </div>
+
       
       <div class="columns">
-        <div class="column is-3">
+        <div class="column is-half">
 
           <div class="field">
             <label class="label">Titulo <span class="has-text-danger">*</span></label>
@@ -33,13 +41,13 @@
               <span class="icon is-medium is-left">
                 <i class="fas fa-images"></i>
               </span>
-              <input class="input" v-model="form.title" type="emailtext" minlength="6" v-bind:class="{'is-danger' : errors && errors.find(a => a.model == 'title')}" :disabled="isProcessing || userInfo && userInfo.role == 'editor'" required>
+              <input class="input" v-model="form.title" type="emailtext" minlength="6" v-bind:class="{'is-danger' : errors && errors.find(a => (a.model == 'title' || a.model == 'slug_key'))}" :disabled="isProcessing || userInfo && userInfo.role == 'editor'" required>
             </div>
           </div> 
 
         </div>
 
-        <div class="column is-3">
+        <div class="column is-half">
 
           <div class="field">
             <label class="label">Descrição <span class="has-text-danger">*</span></label>
@@ -54,7 +62,7 @@
         </div>
       </div>
       <div class="columns">
-        <div class="column is-6">
+        <div class="column is-half">
           <div v-if="errors && errors.length" class="notification is-danger">
             <button class="delete" v-on:click="errors = []"></button>
             <p v-for="error in errors" v-text="error.message"></p>

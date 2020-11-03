@@ -40,3 +40,45 @@ exports.isValidUrl = (string) => {
 
   return true;
 }
+
+
+exports.imageToBase64Async = (file, cb) => {
+  return new Promise((resolve, reject) => {
+    let reader = new FileReader();
+
+    reader.onload = () => {
+      cb(reader.result);
+    };
+
+    reader.onerror = cb(null);
+
+    reader.readAsDataURL(file);
+  })
+}
+
+exports.bytesToSize = (bytes) => {
+   var sizes = [' Bytes', 'kb', 'mb', 'gb', 'tb'];
+   if (bytes == 0) return '0 Byte';
+   var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+   return Math.round(bytes / Math.pow(1024, i), 2) + '' + sizes[i];
+}
+
+exports.getUrlParam = (key) => {
+  var url_string = window.location.href;
+  var url = new URL(url_string);
+  var c = url.searchParams.get(key);
+  return c ? c : null;
+}
+
+
+exports.isDateTimeSupported = () => {
+  var input = document.createElement("input");
+  var value = "a";
+  input.setAttribute("type", "datetime-local");
+  input.setAttribute("value", value);
+  return input.value !== value;
+};
+
+exports.isValidDate = (d) => {
+  return d instanceof Date && !isNaN(d);
+}

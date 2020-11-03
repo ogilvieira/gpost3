@@ -50,7 +50,15 @@ exports.update = async (data, req, res, next) => {
     await ConfigSchema.update(config, { where: { id: req.params.id }});
     return res.send(new SuccessModel("Configuração atualizado com sucesso."));
   } catch (err) {
-    return res.status(403).send(new ErrorModel("Não foi possível atualizar a configuração."));
+    
+    let models = {}
+    if(err.errors) {
+      err.errors.map(a => {
+        models[a.path] = a.message;
+      });
+    }
+
+    return res.status(403).send(new ErrorModel(err && err.message ? err.message : "Não foi possível atualizar a configuração.", models));
   }
 
 }

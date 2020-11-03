@@ -40,19 +40,40 @@ if( document.querySelector("[data-vue=config-list]") ) {
           return;
         }
 
-        if( (key.key_type == "URL" || key.key_type == "IMAGE") && (!key.custom_type || key.key_value.length) && !isValidUrl(key.key_value)) {
+        if( (key.key_type == "URL") && (!key.custom_type || key.key_value.length) && !isValidUrl(key.key_value)) {
           this.errors.push({ model: key.key_slug, message: `Valor de "${key.key_name}" é inválido.`})
           return;
         }
 
+        let _self = this;
 
+
+        if( key.key_type == "IMAGE" && typeof key.key_value !== 'string' ) {
+
+          this.isProcessing = true;
+
+          this.$uploadImage(key.key_value)
+            .then( urlImage => {
+              key.key_value = urlImage;
+              return _self.send(key)
+            })
+            .catch((err) => {
+              console.error(err);
+              _self.isProcessing = false;
+              return;
+            });
+        } else {
+          this.send(key);
+        }
+
+      },
+      send: function(key) {
+        this.isProcessing = true;
         this.$http.put(`/rest/config/${key.id}`, key)
           .then(response => {
             Vue.$toast.open({
               message: response.data && response.data.message ? response.data.message : "",
             });
-
-            window.location.reload();
           })
          .catch( response => {
             if( response.models ) {

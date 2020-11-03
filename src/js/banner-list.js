@@ -5,22 +5,14 @@ if( document.querySelector("[data-vue=banner-list]") ) {
   new Vue({
     el: "[data-vue=banner-list]",
     data: {
-      score: 0,
-      page: 1,
       isProcessing: false,
-      errors: [],
       data: null, 
     },
     methods: {
       fetchInfo: function(page = 1){
         this.isProcessing = true;
-        this.page = page || this.page;
 
-        this.$http.get('/rest/banner', {
-          params : {
-            page: page
-          }
-        })
+        this.$http.get('/rest/banner')
           .then(res => {
             this.data = res.data;
           })

@@ -2,8 +2,7 @@ import Vue from "vue";
 import VueToast from "vue-toast-notification";
 import axios from 'axios'
 import VueTheMask from "vue-the-mask";
-import wysiwyg from "vue-wysiwyg";
-
+import CKEditor from "@ckeditor/ckeditor5-vue";
 
 //set default plugins and configs for Vuejs
 Vue.use(VueToast, {
@@ -14,16 +13,18 @@ Vue.use(VueToast, {
 Vue.use(VueTheMask);
 
 // Add a request interceptor
-axios.interceptors.request.use(function (request) {
+axios.interceptors.request
+  .use(function (request) {
 
     if( !request.url.endsWith('login') ) {
 
         if( !window.localStorage.getItem("token") ){
-          window.location.href = "/login";
-          return;
+          // window.location.href = "/login";
+          console.error("Sem token...");
+        } else {
+          request.headers.Authorization = window.localStorage.getItem("token");
         }
 
-        request.headers.Authorization = window.localStorage.getItem("token");
     }
 
     return request;
@@ -43,7 +44,7 @@ axios.interceptors.response.use(function (response) {
       Object.values(err.models).map((a) => messages.push(a));
     }
 
-    if ( err && err.message && !err.models ) {
+    if ( err && err.message ) {
       messages.push(err.message);
     }
 
@@ -54,22 +55,40 @@ axios.interceptors.response.use(function (response) {
       });
     }
 
-    if(error.response.status == 401) {
+    if(error.response && error.response.status == 401) {
       window.localStorage.clear();
     }
 
-    throw error;
+    if(error.response && error.response.status == 404 ) {
+      throw error;
+    }
+
+    throw (error && error.response && error.response.data ? error.response.data : error);
   });
 
 Vue.prototype.$http = axios;
+Vue.prototype.$uploadImage = function(file) {
+  return new Promise((resolve, reject) => {
+    if(!file){ return reject; }
+  
+    var formData = new FormData();
+    formData.append("image", file)
+  
+    this.$http.post('/rest/media', formData)
+      .then(res => {
+        return resolve(res.data);
+      })
+      .catch(res => {
+        return reject(res)
+      })
+
+  })
 
 
-Vue.use(wysiwyg, {
-  image: {
-    uploadURL: "/rest/media"
-  }
-});
+}
 
+
+Vue.use(CKEditor);
 
 module.exports = Vue;
 
