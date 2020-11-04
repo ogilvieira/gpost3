@@ -4,6 +4,7 @@ import axios from 'axios'
 import VueTheMask from "vue-the-mask";
 import CKEditor from "@ckeditor/ckeditor5-vue";
 
+
 //set default plugins and configs for Vuejs
 Vue.use(VueToast, {
   position: "top-right",
@@ -67,13 +68,14 @@ axios.interceptors.response.use(function (response) {
   });
 
 Vue.prototype.$http = axios;
+
 Vue.prototype.$uploadImage = function(file) {
   return new Promise((resolve, reject) => {
     if(!file){ return reject; }
-  
+
     var formData = new FormData();
     formData.append("image", file)
-  
+
     this.$http.post('/rest/media', formData)
       .then(res => {
         return resolve(res.data);
@@ -83,8 +85,6 @@ Vue.prototype.$uploadImage = function(file) {
       })
 
   })
-
-
 }
 
 

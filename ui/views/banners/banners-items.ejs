@@ -82,13 +82,13 @@
           <div class="columns is-flex-wrap-wrap is-align-items-center">
             
             <div class="column is-6 pb-0 pt-0">
-              <div class="button is-small handle is-movable" title="Ordernar"><i class="fas fa-arrows-alt-v"></i></div>
+              <div class="button is-small handle is-movable" title="Ordernar"><i class="fas fa-arrows-alt"></i></div>
               <span class="tag is-warning">
                 <i class="fas fa-hashtag mr-1"></i><strong v-text="index+1"></strong>
               </span>
             </div>
             <div class="column is-6 p-0 has-text-right">
-              <button class="button is-rounded is-small is-danger mr-2" title="Remover" :disabled="isProcessing" v-on:click="removeItem(item)"><i class="fas fa-times"></i></button>
+              <button class="button is-small is-danger mr-2" title="Remover" :disabled="isProcessing" v-on:click="removeItem(item)"><i class="fas fa-times"></i></button>
             </div>
 
             <div class="column is-4"> 

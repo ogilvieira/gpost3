@@ -59,7 +59,7 @@ exports.get = async (data, req, res, next) => {
  * @security JWTs
  */
 exports.add = async (data, req, res, next) => {
-  
+
   const BannerArea = new TaxonomyModel({
     title: req.body.title,
     description: req.body.description || "",
@@ -71,7 +71,7 @@ exports.add = async (data, req, res, next) => {
     var banner = await TaxonomySchema.create(BannerArea);
     return res.send(new SuccessModel("Área de banner criada com sucesso.", new TaxonomyModel(banner)));
   } catch (err) {
-    
+
     let models = {}
     if(err.errors) {
       err.errors.map(a => {
@@ -109,7 +109,7 @@ exports.update = async (data, req, res, next) => {
     var banner = await TaxonomySchema.update(BannerArea, { where: { id: id }});
     return res.send(new SuccessModel("Área de Banner atualizada com sucesso.", new TaxonomyModel(banner)));
   } catch (err) {
-    
+
     let models = {}
     if(err.errors) {
       err.errors.map(a => {
@@ -162,7 +162,7 @@ exports.updateItem = async (data, req, res, next) => {
   if(!category || !req.body || !itemID) { return res.status(403).send(new ErrorModel()) }
 
   var item = {};
-  
+
   ['title', 'image', 'link', 'order', 'start_date', 'end_date'].map(key =>{
     if(!!req.body[key]) {
       item[key] = req.body[key];
@@ -172,12 +172,12 @@ exports.updateItem = async (data, req, res, next) => {
   if( !item.image || typeof item.image != 'string' ) {
     return res.status(403).send(new ErrorModel("A imagem é obrigatória."));
   }
-  
+
   try {
     await BannerSchema.update(item, { where: { id: itemID, category: category }});
     return res.send(new SuccessModel("Item de Banner atualizado com sucesso."));
   } catch (err) {
-   
+
     let models = {}
     if(err.errors) {
       err.errors.map(a => {
@@ -208,7 +208,7 @@ exports.addItem = async (data, req, res, next) => {
   if(req.body.image && typeof req.body.image != 'string') {
     res.status(403).send(new ErrorModel("A imagem é obrigatório."));
   }
-  
+
   ['title', 'image', 'link', 'order', 'start_date', 'end_date', 'lang'].map(key =>{
     if(!!req.body[key]) {
       item[key] = req.body[key];
@@ -221,7 +221,7 @@ exports.addItem = async (data, req, res, next) => {
     await BannerSchema.create(item);
     return res.send(new SuccessModel("Item de Banner criado com sucesso."));
   } catch (err) {
-   
+
     let models = {}
     if(err.errors) {
       err.errors.map(a => {
@@ -245,14 +245,25 @@ exports.addItem = async (data, req, res, next) => {
 exports.deleteItem = async (data, req, res, next) => {
   const category = req.params.id;
   const itemID = req.params.itemID;
+
   if(!category || !itemID ) { return res.status(403).send(new ErrorModel()) }
 
+
+  const item = await BannerSchema.findOne({ where: { id: itemID, category: category } });
+
+  if( item && item.image ) {
+    try {
+      var imageDeleted = await ImageManager.findAndDelete(item.image);
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   try {
     await BannerSchema.destroy({ where: { id: itemID, category: category }});
     return res.send(new SuccessModel("Item de Banner excluído com sucesso."));
   } catch (err) {
-   
+
     let models = {}
     if(err.errors) {
       err.errors.map(a => {

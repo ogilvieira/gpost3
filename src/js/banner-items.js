@@ -40,7 +40,7 @@ if( document.querySelector("[data-vue=banner-items]") ) {
         this.$http.get(`/rest/banner/${this.areaID}/items`)
           .then(res => {
             this.data = res.data;
-            this.dataRaw = res.data.slice(0);
+            this.dataRaw = JSON.parse(JSON.stringify(res.data));
 
           })
           .catch(res => {
@@ -113,9 +113,7 @@ if( document.querySelector("[data-vue=banner-items]") ) {
       save( data = null ) {
         this.errors = [];
 
-        console.log(this.data, this.dataRaw)
-
-        if(this.data == this.dataRaw){ 
+        if(JSON.stringify(this.data) == JSON.stringify(this.dataRaw)){ 
         
           this.$toast.open({
             type: "error",
@@ -262,7 +260,7 @@ if( document.querySelector("[data-vue=banner-items]") ) {
       updateItems(items) {
         this.uploadStep = 3;
         let itemsToUpdate = items.filter(a => {
-          return this.dataRaw.find(b => b == a); 
+          return this.dataRaw.find(b => JSON.stringify(b) != JSON.stringify(a)); 
         });
 
 

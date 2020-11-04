@@ -29,7 +29,7 @@
 
     <div id="navbarBasicExample" class="navbar-menu" v-bind:class="{'is-active' : showMenu}">
       <div class="navbar-start">
-        
+
 
         <% if (userData && (userData.role == 'dev' || userData.role == 'admin')) { %>
         <a href="/users" class="navbar-item">
@@ -40,6 +40,8 @@
         <a href="/banners" class="navbar-item">
           <i class="mr-1 fas fa-file-image"></i> Banners
         </a>
+
+        <% if(SITE.isDev) { %>
 
         <div class="navbar-item has-dropdown is-hoverable">
           <a class="navbar-link">
@@ -56,6 +58,8 @@
             </a>
           </div>
         </div>
+        <% } %>
+
         <% if (userData && userData.role == 'dev') { %>
         <a class="navbar-item" href="/api-docs" target="_blank">
           <i class="mr-1 fas fa-file-code"></i> Docs

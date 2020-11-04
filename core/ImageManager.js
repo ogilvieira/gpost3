@@ -1,4 +1,5 @@
 const ErrorModel = require('./models/ErrorModel');
+const SuccessModel = require('./models/SuccessModel');
 const path = require('path');
 const fs = require('fs');
 const imagemin = require('imagemin');
@@ -66,3 +67,28 @@ exports.upload = async (files) => {
 
 }
 
+exports.findAndDelete = async ( filename ) => {
+  if(!filename) { throw new ErrorModel("O nome do arquivo é requerido."); }
+
+
+  if ( !(/\.(gif|jpg|jpeg|png)$/i).test(path.extname(filename)) ) {
+    throw new ErrorModel("Tipo de arquivo inválido.");
+  }
+
+  filename = filename.split('\/').slice(-1)[0];
+
+  const file_path = path.join(__dirname, '../public/upload/'+filename);
+
+  if(!fs.existsSync(file_path)) {
+    throw new ErrorModel("O arquivo não existe.");
+  }
+
+  fs.unlink(file_path, (err) => {
+    if (err) {
+      throw new ErrorModel();
+    }
+  });
+
+
+  return new SuccessModel("Arquivo excluído com sucesso.");
+}

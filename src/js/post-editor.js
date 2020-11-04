@@ -2,9 +2,11 @@ import Vue from "./VueBase.js";
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import "@ckeditor/ckeditor5-build-classic/build/translations/pt-br.js";
 import InputImage from "./components/InputImage.vue";
+import UploadAdapter from './UploadAdapter';
 
 if( document.querySelector("[data-vue=post-editor]") ) {
-  new Vue({
+
+  var vm = new Vue({
     el: "[data-vue=post-editor]",
     components: {
       "input-image": InputImage
@@ -26,17 +28,17 @@ if( document.querySelector("[data-vue=post-editor]") ) {
             { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' }
           ]
         },
-        simpleUpload: {
-          uploadUrl: {
-            url: '/rest/media',
-            headers: {
-              'Authorization' : window.localStorage.getItem("token")
-            }
-          }
-        }
+        extraPlugins: [ uploader ]
       }
     },
     methods: {
     }
   });
+
+  function uploader(editor) {
+    editor.plugins.get( 'FileRepository' ).createUploadAdapter = ( loader ) => {
+      return new UploadAdapter(loader, vm);
+    };
+  }
+
 }

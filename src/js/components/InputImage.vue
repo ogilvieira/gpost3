@@ -97,7 +97,7 @@
 
         if(!confirm){ return; }
 
-        var file = this.value.split('\/').slice(-1);
+        var file = this.value;
 
         this.isProcessing = true;
 
