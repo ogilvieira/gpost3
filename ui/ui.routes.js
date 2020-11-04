@@ -9,7 +9,7 @@ const Banners = require('./controllers/BannersController.js');
 const Users = require('./controllers/UsersController.js');
 const Config = require('./controllers/ConfigController.js');
 const Articles = require('./controllers/ArticlesController.js');
-const AuthGuard = require("../AuthGuard");
+const AuthGuard = require("../core/AuthGuard");
 
 module.exports = (app) => {
 

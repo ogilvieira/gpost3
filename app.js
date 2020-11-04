@@ -9,6 +9,7 @@ const path    = require('path');
 const fs = require('fs');
 const pjson = require('./package.json');
 const fileUpload = require('express-fileupload');
+const cors = require('cors');
 
 var isInstall = false;
 
@@ -16,7 +17,7 @@ if( process.env.NO_INSTALL ) {
   isInstall = process.env.NO_INSTALL == 'true';
 } else {
   isInstall = fs.existsSync(path.join(__dirname, '.install'));
-} 
+}
 
 const app = express();
 
@@ -48,12 +49,12 @@ var BASE_URL = "";
 app.use((req, res, next) => {
   let port = process.env.PORT || 8080;
 
-  if(req.url.endsWith('.jpg') || 
-    req.url.endsWith('.jpeg') || 
+  if(req.url.endsWith('.jpg') ||
+    req.url.endsWith('.jpeg') ||
     req.url.endsWith('.png') ||
     req.url.endsWith('.svg') ||
     req.url.endsWith('.webp') ||
-    req.url.endsWith('.gif')){ 
+    req.url.endsWith('.gif')){
 
     res.set({ 'Cache-Control':'public, max-age=31536000' });
 
@@ -68,7 +69,12 @@ app.use((req, res, next) => {
 const routes = require(path.join(__dirname, `${ isInstall ? 'install/install' : 'ui/ui'}.routes.js`))(app);
 app.use('/', routes);
 const routesRest = require(path.join(__dirname, 'rest/rest.routes.js'))(app);
-app.use('/rest', routesRest);  
+app.use('/rest/public/', cors({
+    credentials: true,
+    origin: (origin, cb) => {  return cb(null, true); }
+  }));
+
+app.use('/rest', routesRest);
 
 
 //set swagger
@@ -80,7 +86,7 @@ let optionsSwagger = {
       title: pjson.name,
       version: pjson.version,
     },
-    host: `localhost:${app.get('port')}`,
+    host: `${BASE_URL}`,
     basePath: '/',
     produces: [
     "application/json",
@@ -102,6 +108,8 @@ let optionsSwagger = {
 };
 
 expressSwagger(optionsSwagger);
+
+
 
 //start server
 const server = http.createServer(app);

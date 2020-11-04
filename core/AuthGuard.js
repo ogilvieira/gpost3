@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
-const { UserSchema } = require('./core/schemas');
-const UserModel = require('./core/models/UserModel');
-const ErrorModel = require('./core/models/ErrorModel');
+const { UserSchema } = require('./schemas');
+const UserModel = require('./models/UserModel');
+const ErrorModel = require('./models/ErrorModel');
 
 exports.checkAdmin = (data, req, res, next) => {
   if( !data.userData || data.userData instanceof ErrorModel ) {
@@ -21,8 +21,8 @@ exports.checkAuthorization = async (req, res, next) => {
 
   const token = req.get('Authorization') || req.cookies.token || null;
 
-  if( !token ) { 
-    return next(data); 
+  if( !token ) {
+    return next(data);
   }
 
   var jwtCheck = null;
@@ -36,9 +36,9 @@ exports.checkAuthorization = async (req, res, next) => {
 
   data.userData = await UserSchema.findOne({ where: { id: jwtCheck.id } });
 
-  if(!data.userData){ 
+  if(!data.userData){
     data.userData = new ErrorModel("Usuário não encontrado.");
-    return next(data); 
+    return next(data);
   }
 
   data.userData = new UserModel(data.userData);
@@ -53,10 +53,9 @@ exports.checkAuthorization = async (req, res, next) => {
 
 exports.checkToBlock = (data, req, res, next) => {
 
-  console.log
 
   if( !data.userData || data.userData instanceof ErrorModel ) {
-    
+
     res.clearCookie('token');
 
     if( req.originalUrl.startsWith('/rest') ) {

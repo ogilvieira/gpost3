@@ -2,9 +2,44 @@ const ErrorModel = require('../../core/models/ErrorModel');
 const SuccessModel = require('../../core/models/SuccessModel');
 const BannerModel = require('../../core/models/BannerModel');
 const TaxonomyModel = require('../../core/models/TaxonomyModel');
-const { TaxonomySchema, BannerSchema } = require('../../core/schemas');
+const { TaxonomySchema, BannerSchema, Sequelize } = require('../../core/schemas');
 const ImageManager = require('../../core/ImageManager');
 
+
+/**
+ * @route GET /rest/public/banner/{id}
+ * @group Public
+ * @param {integer} id.path
+ * @returns {Array<Banner>} 200
+ * @returns {Error.model} 401
+ */
+exports.getItemsPublic = async (req, res, next) => {
+
+  const id = req.params.id;
+
+  if(!id) { return res.status(403).send(new ErrorModel()) }
+
+  try {
+    var banners = await BannerSchema.findAll({
+      attributes: ['image', 'title', 'link'],
+      where: {
+        category: id,
+        start_date: {
+          [Sequelize.Op.lte]: new Date()
+        },
+        end_date: {
+          [Sequelize.Op.gte]: new Date()
+        }
+      },
+      order: [['order','ASC']]
+    });
+    return res.send(banners);
+  } catch (err) {
+    console.log(err);
+    return res.status(404).send(new ErrorModel("Área de banner não encontrada."));
+  }
+
+}
 
 /**
  * @route GET /rest/banner

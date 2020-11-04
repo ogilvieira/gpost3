@@ -20,7 +20,7 @@ var cache = (duration) => {
   }
 }
 
-const AuthGuard = require("../AuthGuard");
+const AuthGuard = require("../core/AuthGuard");
 const Account = require("./controllers/Account.Rest.Controller");
 const User = require("./controllers/User.Rest.Controller");
 const Config = require("./controllers/Config.Rest.Controller");
@@ -29,7 +29,7 @@ const Banner = require("./controllers/Banner.Rest.Controller");
 
 
 module.exports = (app) => {
-  
+
   router.get('/', (req, res) => {
     res.status(200).send({});
   });
@@ -65,6 +65,9 @@ module.exports = (app) => {
   router.route("/banner/:id")
     .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, Banner.get)
     .put(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, Banner.update)
+
+  router.route("/public/banner/:id")
+    .get(Banner.getItemsPublic);
 
   router.route("/banner/:id/items")
     .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Banner.getItems)
