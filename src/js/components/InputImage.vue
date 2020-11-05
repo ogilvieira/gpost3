@@ -19,7 +19,7 @@
   </div>
 </template>
 <script>
-  
+
   const { imageToBase64Async, bytesToSize } = require('../utils.js');
 
   module.exports = {
@@ -79,7 +79,7 @@
 
           return;
         }
-        
+
         this.updateValue(file);
 
         return;
@@ -89,7 +89,7 @@
 
         if(typeof this.value == 'object') {
           this.imageBase64 = null;
-          this.updateValue(null);
+          this.updateValue("");
           return;
         }
 
@@ -103,11 +103,13 @@
 
         this.$http.delete(`/rest/media/${file}`)
           .then(res => {
-            this.updateValue(null, true);
+            this.imageBase64 = null;
+            this.updateValue("", true);
           })
           .catch((err) => {
             if(err.response && err.response.status == 404) {
-              this.updateValue(null, true);
+              this.updateValue("", true);
+              this.imageBase64 = null;
             }
           })
           .then(res => {

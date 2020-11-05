@@ -10,29 +10,38 @@ const ImageManager = require('../../core/ImageManager');
  * @route GET /rest/public/banner/{id}
  * @group Public
  * @param {integer} id.path
+ * @param {integer} limit.query
  * @returns {Array<Banner>} 200
  * @returns {Error.model} 401
  */
 exports.getItemsPublic = async (req, res, next) => {
 
   const id = req.params.id;
+  const limit = req.query.limit && !isNaN(req.query.limit) ? Number(req.query.limit) : 0;
 
   if(!id) { return res.status(403).send(new ErrorModel()) }
 
-  try {
-    var banners = await BannerSchema.findAll({
-      attributes: ['image', 'title', 'link'],
-      where: {
-        category: id,
-        start_date: {
-          [Sequelize.Op.lte]: new Date()
-        },
-        end_date: {
-          [Sequelize.Op.gte]: new Date()
-        }
+  const query = {
+    attributes: ['image', 'title', 'link', 'order'],
+    where: {
+      category: id,
+      image: {
+        [Sequelize.Op.not]: null
       },
-      order: [['order','ASC']]
-    });
+      start_date: {
+        [Sequelize.Op.lte]: new Date()
+      },
+      end_date: {
+        [Sequelize.Op.gte]: new Date()
+      }
+    },
+    order: [['order','ASC']]
+  }
+
+  if( limit ) { query.limit = limit; }
+
+  try {
+    var banners = await BannerSchema.findAll(query);
     return res.send(banners);
   } catch (err) {
     console.log(err);

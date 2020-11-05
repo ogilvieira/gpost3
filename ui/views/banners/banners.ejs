@@ -18,7 +18,7 @@
       <hr class="mt-0 mb-3">
 
       <div class="columns is-flex-wrap-wrap">
-        <div class="column is-3" v-for="area in data"> 
+        <div class="column is-3" v-for="area in data">
           <div class="box">
             <div><i class="fas fa-images mr-2 has-text-info"></i><strong v-text="area.title"></strong></div>
             <p class="is-size-7 has-text-grey-light" v-text="area.description"></p>
@@ -27,7 +27,9 @@
             <div class="columns mt-2">
               <div class="column">
                 <a :href="'/banners/'+area.id+'/items'" class="button is-rounded is-small is-success mb-1"><i class="fas fa-edit mr-2"></i> Editar</a>
+                <% if(userData && userData.role != 'editor') { %>
                 <a :href="'/banners/'+area.id" class="button is-rounded is-small  mb-1"><i class="fas fa-cog mr-2"></i> Configurar</a>
+                <% } %>
               </div>
             </div>
           </div>

@@ -5,7 +5,7 @@
   <div class="hero">
      <div class="hero-body">
 
-      <div class="container">
+      <div class="container" v-if="!loaded">
         <div class="columns">
           <div class="column">
             <div class="box is-size-6"> <i class="fas fa-sync-alt fa-spin mr-2"></i> Carregando...</div>
@@ -13,7 +13,7 @@
         </div>
       </div>
 
-      <div class="container">
+      <div class="container" v-if="loaded && !data">
         <div class="columns">
           <div class="column">
             <div class="notification">
@@ -32,15 +32,15 @@
       </div>
 
 
-    
-      <div class="container">
+
+      <div class="container" v-if="loaded">
         <div class="columns">
           <div class="column is-9">
 
             <div class="mb-3">
-              <button class="button is-small is-success"><i class="fa fa-save mr-1"></i> Salvar e sair</button>
-              <button class="button is-small is-info"><i class="fa fa-pen-square mr-1"></i> Salvar e continuar editando</button>
-              <button class="button is-small is-danger is-light"><i class="fa fa-times mr-1"></i> Cancelar Edição</button>
+              <button class="button is-small is-success" v-bind:class="{'is-loading' : isProcessing }"><i class="fa fa-save mr-1"></i> Salvar e sair</button>
+              <button class="button is-small is-info" v-bind:class="{'is-loading' : isProcessing }"><i class="fa fa-pen-square mr-1"></i> Salvar e continuar editando</button>
+              <button class="button is-small is-danger is-light" v-bind:class="{'is-loading' : isProcessing }"><i class="fa fa-times mr-1"></i> Cancelar Edição</button>
             </div>
 
 
@@ -128,7 +128,7 @@
 
             <hr>
 
-            <div class="mb-3">             
+            <div class="mb-3">
               <div class="select">
                 <select>
                   <option>Sem Categoria</option>
@@ -192,8 +192,8 @@
           </div>
         </div>
       </div>
-       
+
      </div>
-   </div> 
+   </div>
 
 </section>

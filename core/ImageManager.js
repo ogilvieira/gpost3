@@ -51,19 +51,19 @@ exports.upload = async (files) => {
         plugins: [
           imageminJpegtran({ progressive: true }),
           imageminMozjpeg({
-            quality: 70
+            quality: 90
           }),
-          imageminPngquant({quality: [0.6, 0.8]})
+          imageminPngquant({quality: [0.8, 0.9]})
         ]
       });
-      
+
     } catch (err) {
       throw new ErrorModel("Erro ao tentar comprimir o arquivo.");
     }
   }
 
 
-  return ((process.env.SITE_BASE_URL || '/')+'upload/'+image.name);  
+  return ((process.env.BASE_URL || '/')+'upload/'+image.name);
 
 }
 

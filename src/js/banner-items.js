@@ -23,8 +23,9 @@ if( document.querySelector("[data-vue=banner-items]") ) {
       uploadsItemsCompleted: 0,
       uploadErros: [],
       errors: [],
+      area: null,
       dataRaw: [],
-      data: [] 
+      data: []
     },
     props: {
       areaID: {
@@ -35,6 +36,14 @@ if( document.querySelector("[data-vue=banner-items]") ) {
       },
     },
     methods: {
+      fetchArea: function() {
+        this.$http.get(`/rest/banner/${this.areaID}`)
+          .then(res => {
+            this.area = res.data;
+          }).catch(err => {
+             console.error(err.data);
+          });
+      },
       fetchInfo: function(){
         this.isProcessing = true;
         this.$http.get(`/rest/banner/${this.areaID}/items`)
@@ -79,7 +88,7 @@ if( document.querySelector("[data-vue=banner-items]") ) {
         if(!confirm){ return; }
 
 
-        if(!item.isNew){ 
+        if(!item.isNew){
           if(!item.id){ return; }
 
           this.isProcessing = true;
@@ -113,20 +122,20 @@ if( document.querySelector("[data-vue=banner-items]") ) {
       save( data = null ) {
         this.errors = [];
 
-        if(JSON.stringify(this.data) == JSON.stringify(this.dataRaw)){ 
-        
+        if(JSON.stringify(this.data) == JSON.stringify(this.dataRaw)){
+
           this.$toast.open({
             type: "error",
             message: "Não há alterações para salvar."
           })
 
-          return; 
+          return;
         }
 
         let items = data ? data : this.data;
 
         items.map(a => {
-        
+
           if (a.title.length < 3) {
             this.errors.push({ model: a.id+`_title`, message: `Titulo inválido.`});
           }
@@ -260,7 +269,7 @@ if( document.querySelector("[data-vue=banner-items]") ) {
       updateItems(items) {
         this.uploadStep = 3;
         let itemsToUpdate = items.filter(a => {
-          return this.dataRaw.find(b => JSON.stringify(b) != JSON.stringify(a)); 
+          return this.dataRaw.find(b => JSON.stringify(b) != JSON.stringify(a));
         });
 
 
@@ -323,9 +332,16 @@ if( document.querySelector("[data-vue=banner-items]") ) {
             if(!this.uploadErros.length) { this.fetchInfo(); }
           });
 
+      },
+      discard: function() {
+        let confirm = window.confirm("Quer mesmo descartar suas alterações?");
+        if(!confirm){ return; }
+
+        this.data = JSON.parse(JSON.stringify(this.dataRaw));
       }
     },
     created: function() {
+      this.fetchArea();
       this.fetchInfo();
 
       let _self = this;

@@ -2,9 +2,14 @@
 <section class="hero" data-vue="banner-items" data-area-id="<%=areaID%>" v-cloak>
   <div class="hero-body">
     <div class="container">
-    
-    <div class="columns has-text-right">
-      <div class="column">
+
+    <div class="columns">
+      <div class="column" v-if="area">
+        <h2 class="subtitle mb-1"><i class="fas fa-images mr-2 has-text-info"></i> <strong v-text="area.title"></strong></h2>
+        <code class="is-size-7"><i class="fas fa-code mr-1"></i>id: <span v-text="area.id"></span></code>
+      </div>
+
+      <div class="column has-text-right">
         <a href="/banners" class="button">
           <span class="icon">
             <i class="fas fa-caret-left"></i>
@@ -17,6 +22,10 @@
           </span>
           <span>Salvar</span>
         </button>
+
+        <div class="mt-2" v-if="JSON.stringify(dataRaw) != JSON.stringify(data)">
+          <a href="javascript:void(0);" v-on:click="discard()"><i class="fas fa-trash"></i> Descartar alterações </a>
+        </div>
       </div>
     </div>
 
@@ -24,8 +33,8 @@
 
     <div class="columns" v-if="isUploading">
       <div class="column">
-        <div class="box is-size-6"> <i class="fas fa-sync-alt fa-spin mr-2"></i> 
-          <span v-text="uploadsItemsCompleted+'/'+uploadStepItems"></span> 
+        <div class="box is-size-6"> <i class="fas fa-sync-alt fa-spin mr-2"></i>
+          <span v-text="uploadsItemsCompleted+'/'+uploadStepItems"></span>
           <span v-if="uploadStep == 1">Fazendo upload de imagens...</span>
           <span v-if="uploadStep == 2">Criando novos itens...</span>
           <span v-if="uploadStep == 3">Atualizando itens...</span>
@@ -36,7 +45,7 @@
     <div class="columns" v-if="!isUploading && uploadErros.length">
       <div class="column">
         <div class="notification is-danger">
-          
+
           <div class="mb-2"><i class="fas fa-exclamation-circle mr-1"></i> Não foi possível processar alguns dos itens.</div>
 
           <button class="button is-rounded is-small" v-on:click="save(uploadErros)">
@@ -47,7 +56,7 @@
               Tentar Novamente
             </span>
           </button>
-          
+
         </div>
       </div>
     </div>
@@ -60,7 +69,7 @@
     <div class="columns" v-if="loaded && !data.length">
       <div class="column">
         <div class="notification">
-          
+
           <div class="mb-2"><i class="fas fa-exclamation-circle mr-1"></i> Nenhum item encontrado.</div>
 
           <button class="button is-rounded is-small" v-on:click="fetchInfo()" v-bind:class="{'is-loading' : isProcessing }">
@@ -71,7 +80,7 @@
               Tentar Novamente
             </span>
           </button>
-          
+
         </div>
       </div>
     </div>
@@ -80,7 +89,7 @@
       <transition-group>
         <div class="box" v-for="(item, index) in data" :key="item.id">
           <div class="columns is-flex-wrap-wrap is-align-items-center">
-            
+
             <div class="column is-6 pb-0 pt-0">
               <div class="button is-small handle is-movable" title="Ordernar"><i class="fas fa-arrows-alt"></i></div>
               <span class="tag is-warning">
@@ -91,7 +100,7 @@
               <button class="button is-small is-danger mr-2" title="Remover" :disabled="isProcessing" v-on:click="removeItem(item)"><i class="fas fa-times"></i></button>
             </div>
 
-            <div class="column is-4"> 
+            <div class="column is-4">
               <input-image v-model="item.image" :invalid="errors && !!errors.find(a => a.model == (item.id+'_image'))" v-on:deleteupload="save(item.id)" :candelete="false"></input-image>
             </div>
 
@@ -103,7 +112,7 @@
                     <i class="fas fa-font"></i>
                   </span>
                 </div>
-              </div> 
+              </div>
 
               <div class="field">
                 <div class="control has-icons-left">
@@ -112,12 +121,12 @@
                     <i class="fas fa-link"></i>
                   </span>
                 </div>
-              </div> 
+              </div>
 
             </div>
 
             <div class="column is-4">
-              
+
               <div class="field is-horizontal">
                 <div class="field-label is-small">
                   <label class="label">De</label>
@@ -161,7 +170,7 @@
     <div class="notification is-danger mt-3" v-if="data.filter(a => a.isNew).length >= 3">
       <i class="fa fa-exclamation-circle mr-1"></i> Salve as alterações ou remova banner não salvos para poder adicionar novos banners.
     </div>
-    
+
     <button slot="footer" class="button is-large is-fullwidth mt-2 mb-5" v-on:click="addNew()" :disabled="data.filter(a => a.isNew).length >= 3">
       <span class="icon"><i class="fa fa-plus-circle"></i></span> <span>Adicionar Novo</span>
     </button>

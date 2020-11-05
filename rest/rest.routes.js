@@ -63,7 +63,7 @@ module.exports = (app) => {
   router.post("/banner", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Banner.add)
 
   router.route("/banner/:id")
-    .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, Banner.get)
+    .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Banner.get)
     .put(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, Banner.update)
 
   router.route("/public/banner/:id")

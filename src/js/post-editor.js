@@ -29,12 +29,23 @@ if( document.querySelector("[data-vue=post-editor]") ) {
           ]
         },
         extraPlugins: [ uploader ]
-      }
+      },
+      isProcessing: false,
+      isLoaded: false,
+      data: null,
     },
     methods: {
+      fetchInfo() {
+        this.isProcessing = true;
+
+      },
+    },
+    created: function() {
+      this.fetchInfo();
     }
   });
 
+  //set editor
   function uploader(editor) {
     editor.plugins.get( 'FileRepository' ).createUploadAdapter = ( loader ) => {
       return new UploadAdapter(loader, vm);
