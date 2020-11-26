@@ -1,2 +1,180 @@
 <% layout('../ui.layout') -%>
-<p>Articles Edit</p>
+
+<sectio class="hero">
+  <div class="hero-body">
+
+    <div class="container" v-if="!loaded">
+      <div class="columns">
+        <div class="column">
+          <div class="box is-size-6"> <i class="fas fa-sync-alt fa-spin mr-2"></i> Carregando...</div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="container" v-if="loaded && !data">
+      <div class="columns">
+        <div class="column">
+          <div class="notification">
+            Item não encontrado.
+            <button class="button is-rounded is-small">
+              <span class="icon">
+                <i class="fas fa-sync-alt"></i>
+              </span>
+              <span>
+                Tentar Novamente
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="container">
+      <div class="columns">
+        <div class="column">
+          <div class="subtitle mb-1"><i class="fas fa-newspaper mr-2 has-text-info"></i> Posts</div>
+          <code class="is-size-7"><i class="fas fa-code mr-1"></i>id: <span>1</span></code>
+        </div>
+
+        <div class="column has-text-right">
+          <a href="/banners" class="button">
+            <span class="icon">
+              <i class="fas fa-caret-left"></i>
+            </span>
+            <span>Voltar</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="columns">
+        <div class="column is-9">
+          <div class="box">
+
+            <div class="field">
+             <div class="is-size-7 m-1">
+                <a href="javascript:void(0);"><span>/posts</span><i class="fas fa-edit ml-1"></i></a>
+              </div>
+              <div class="control has-icons-left">
+                <input class="input" type="text" minlength="6" placeholder="Titulo">
+                <span class="icon is-left">
+                  <i class="fas fa-heading"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="control is-small has-icons-left">
+                <input class="input is-small" type="text" minlength="6" placeholder="SEO Headline">
+                <span class="icon is-small is-left">
+                  <i class="fas fa-heading"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="control is-small">
+                <textarea class="textarea is-small has-fixed-size" rows="2" placeholder="Descrição curta" maxlength="120"></textarea>
+              </div>
+              <small class="is-size-7 has-text-grey">
+                <i class="fa fa-keyboard mr-1"></i> <span><span>0</span>/120 caracteres.</span>
+              </small>
+
+            </div>
+
+          </div> <!-- /.box -->
+
+
+          <div>
+
+            <div class="box mb-3">
+
+              <div class="columns">
+                <div class="column">
+                  <div class="select is-small">
+                    <select>
+                      <option>Texto</option>
+                      <option>Combo</option>
+                      <option>Multiplos Valores</option>
+                      <option>Link</option>
+                      <option>Imagem</option>
+                      <option>Data</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="column">
+                  <div class="field">
+                    <div class="control is-small has-icons-left">
+                      <input class="input is-small" type="text" minlength="6" placeholder="Nome do Campo">
+                      <span class="icon is-small is-left">
+                        <i class="fas fa-font"></i>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="column">
+                  <div class="field">
+                    <div class="control is-small has-icons-left">
+                      <input class="input is-small" type="text" minlength="6" placeholder="Chave">
+                      <span class="icon is-small is-left">
+                        <i class="fas fa-code"></i>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="column has-text-right">
+                  <button class="button is-small is-danger"><i class="fas fa-times mr-1"></i> Remover Campo</button>
+                </div>
+
+              </div>
+
+
+              <label class="checkbox">
+                <input type="checkbox" class="mr-1">Tornar Obrigatório
+              </label>
+            </div>
+
+
+
+          </div>
+
+
+          <div>
+            <div>
+              <button class="button"><i class="fa fa-plus-circle mr-2"></i> Novo campo customizado</button>
+            </div>
+
+            <small class="is-size-7 has-text-grey">
+              <i class="fa fa-exclamation-circle mr-1"></i> Será adicionado na edição dos conteúdos deste Tipo de Post.</span>
+            </small>
+          </div>
+
+
+        </div><!-- /.column -->
+        <div class="column is-3">
+          <div class="mb-3">
+            <input-image :placeholder="'Imagem de capa'"></input-image>
+          </div>
+          <hr>
+          <div class="select mb-3">
+            <select>
+              <option>Conteúdo de Artigos</option>
+            </select>
+          </div>
+          <div class="select mb-3">
+            <select>
+              <option>Exibir conteúdo nas buscas</option>
+              <option>Não exibir conteúdo nas buscas</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /.hero-body -->
+
+</sectio>
