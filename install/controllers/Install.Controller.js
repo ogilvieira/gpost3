@@ -83,7 +83,8 @@ exports.index = async (req, res) => {
     proms.push(PostTypeSchema.create({
       title: "Posts",
       description: "",
-      slug: 'posts'
+      slug: 'posts',
+      slugKey: 'ARTICLEposts'
     }));
   }
 

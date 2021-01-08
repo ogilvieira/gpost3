@@ -41,30 +41,31 @@
           <i class="mr-1 fas fa-file-image"></i> Banners
         </a>
 
-        <% if(SITE.isDev) { %>
+        <% SITE.articlesAreas.forEach( articleArea => { %>
 
         <div class="navbar-item has-dropdown is-hoverable">
           <a class="navbar-link">
-            Posts
+            <%=articleArea.title%>
           </a>
 
           <div class="navbar-dropdown">
-            <a href="/articles/posts" class="navbar-item">
-              Artigos
+            <a href="/articles/<%=articleArea.id%>" class="navbar-item">
+              Items
             </a>
             <hr class="navbar-divider">
-            <a href="/articles/posts/edit" class="navbar-item">
+            <a href="/articles/<%=articleArea.id%>/edit" class="navbar-item">
               Configurar
             </a>
           </div>
         </div>
+        <% }) %>
+
         <% } %>
 
         <% if (userData && userData.role == 'dev') { %>
         <a class="navbar-item" href="/api-docs" target="_blank">
           <i class="mr-1 fas fa-file-code"></i> Docs
         </a>
-        <% } %>
 
         <% if (userData && (userData.role == 'dev' || userData.role == 'admin')) { %>
         <a href="/config" class="navbar-item">

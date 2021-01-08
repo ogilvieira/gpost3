@@ -4,7 +4,7 @@ exports.index = async (data, req, res, next) => {
 }
 
 exports.edit = async (data, req, res, next) => {
-  data.SITE.title = "Edit";
+  data.SITE.title = "Configurar";
   return res.render('articles/edit', data);
 }
 

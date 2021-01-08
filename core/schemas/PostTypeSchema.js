@@ -1,7 +1,7 @@
 "use strict"
 const sequelizePaginate = require('sequelize-paginate');
 
-module.exports = function(sequelize, DataTypes) { 
+module.exports = function(sequelize, DataTypes) {
   // Define resource
   var PostType = sequelize.define('posttype', {
     title: {
@@ -40,6 +40,11 @@ module.exports = function(sequelize, DataTypes) {
     lang: {
       type: DataTypes.STRING,
       defaultValue: 'pt-br'
+    },
+    slugKey: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true
     }
   });
 

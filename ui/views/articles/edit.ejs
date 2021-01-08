@@ -1,6 +1,6 @@
 <% layout('../ui.layout') -%>
 
-<sectio class="hero">
+<section class="hero" data-vue="posttype-edit" data-id="1" v-cloak>
   <div class="hero-body">
 
     <div class="container" v-if="!loaded">
@@ -17,7 +17,7 @@
         <div class="column">
           <div class="notification">
             Item não encontrado.
-            <button class="button is-rounded is-small">
+            <button class="button is-rounded is-small" v-on:click="fetchInfo()">
               <span class="icon">
                 <i class="fas fa-sync-alt"></i>
               </span>
@@ -31,11 +31,11 @@
     </div>
 
 
-    <div class="container">
+    <div class="container" v-if="loaded && data">
       <div class="columns">
         <div class="column">
-          <div class="subtitle mb-1"><i class="fas fa-newspaper mr-2 has-text-info"></i> Posts</div>
-          <code class="is-size-7"><i class="fas fa-code mr-1"></i>id: <span>1</span></code>
+          <div class="subtitle mb-1"><i class="fas fa-newspaper mr-2 has-text-info"></i> {{data.title}}</div>
+          <code class="is-size-7"><i class="fas fa-code mr-1"></i>id: <span v-text="data.id"></span></code>
         </div>
 
         <div class="column has-text-right">
@@ -53,20 +53,30 @@
           <div class="box">
 
             <div class="field">
-             <div class="is-size-7 m-1">
-                <a href="javascript:void(0);"><span>/posts</span><i class="fas fa-edit ml-1"></i></a>
+
+              <div class="is-size-7 m-1" v-if="!editSlug">
+                <a href="javascript:void(0);" v-on:click="editSlug = true"><span v-text="'/'+form.slug"></span><i class="fas fa-edit ml-1"></i></a>
               </div>
+
+              <div class="control mb-2" v-if="editSlug">
+                <input class="input is-small" v-on:keyup="slugifySlug()" v-model="form.slug" type="text" minlength="3" placeholder="Slug">
+                <a class="is-size-7" href="javascript:void(0);" v-on:click="editSlug = false">
+                  <span>Terminar edição</span>
+                  <i class="fas fa-check ml-1"></i>
+                </a>
+              </div>
+
               <div class="control has-icons-left">
-                <input class="input" type="text" minlength="6" placeholder="Titulo">
+                <input class="input" v-model="form.title" type="text" minlength="6" placeholder="Titulo">
                 <span class="icon is-left">
                   <i class="fas fa-heading"></i>
                 </span>
               </div>
             </div>
 
-            <div class="field">
+            <div class="field" v-if="optionsSEO">
               <div class="control is-small has-icons-left">
-                <input class="input is-small" type="text" minlength="6" placeholder="SEO Headline">
+                <input class="input is-small" v-model="form.seo_title" type="text" minlength="6" placeholder="SEO Headline">
                 <span class="icon is-small is-left">
                   <i class="fas fa-heading"></i>
                 </span>
@@ -75,10 +85,20 @@
 
             <div class="field">
               <div class="control is-small">
-                <textarea class="textarea is-small has-fixed-size" rows="2" placeholder="Descrição curta" maxlength="120"></textarea>
+                <textarea class="textarea is-small has-fixed-size" rows="2" v-model="form.description" placeholder="Descrição curta" maxlength="120"></textarea>
               </div>
               <small class="is-size-7 has-text-grey">
-                <i class="fa fa-keyboard mr-1"></i> <span><span>0</span>/120 caracteres.</span>
+                <i class="fa fa-keyboard mr-1"></i> <span><span v-text="form.description.length"></span>/120 caracteres.</span>
+              </small>
+
+            </div>
+
+            <div class="field" v-if="optionsSEO">
+              <div class="control is-small">
+                <textarea class="textarea is-small has-fixed-size" rows="2" v-model="form.seo_description" placeholder="Descrição curta para SEO" maxlength="120"></textarea>
+              </div>
+              <small class="is-size-7 has-text-grey">
+                <i class="fa fa-keyboard mr-1"></i> <span><span v-text="form.seo_description.length">0</span>/120 caracteres.</span>
               </small>
 
             </div>
@@ -88,54 +108,104 @@
 
           <div>
 
-            <div class="box mb-3">
+            <div class="box mb-3" v-for="(input,index) in form.custom_fields">
 
-              <div class="columns">
-                <div class="column">
-                  <div class="select is-small">
-                    <select>
-                      <option>Texto</option>
-                      <option>Combo</option>
-                      <option>Multiplos Valores</option>
-                      <option>Link</option>
-                      <option>Imagem</option>
-                      <option>Data</option>
-                    </select>
+              <div v-if="!input.edit_mode">
+                <div class="columns">
+                  <div class="column">
+                      Texto
+                  </div>
+
+                  <div class="column">
+                    <span v-text="input.title"></span>
+                  </div>
+
+                  <div class="column">
+                    <code v-text="input.key"></code>
+                  </div>
+
+                  <div class="column has-text-right">
+                    <button class="button is-small" v-on:click="input.edit_mode = true"><i class="fas fa-edit mr-1"></i> Editar</button>
+                  </div>
+
+                </div>
+                <div class="columns" v-if="input.type == 'MULTIPLE' || input.type == 'SELECT'">
+                  <div class="column is-full">
+                    <span v-text="input.options"></span>
                   </div>
                 </div>
 
-                <div class="column">
-                  <div class="field">
-                    <div class="control is-small has-icons-left">
-                      <input class="input is-small" type="text" minlength="6" placeholder="Nome do Campo">
-                      <span class="icon is-small is-left">
-                        <i class="fas fa-font"></i>
-                      </span>
-                    </div>
-                  </div>
-                </div>
 
-                <div class="column">
-                  <div class="field">
-                    <div class="control is-small has-icons-left">
-                      <input class="input is-small" type="text" minlength="6" placeholder="Chave">
-                      <span class="icon is-small is-left">
-                        <i class="fas fa-code"></i>
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                <strong class="is-size-7" v-if="input.required">Campo Obrigatório</strong>
 
-                <div class="column has-text-right">
-                  <button class="button is-small is-danger"><i class="fas fa-times mr-1"></i> Remover Campo</button>
-                </div>
 
               </div>
 
+              <div v-if="input.edit_mode">
+                <div class="columns">
+                  <div class="column">
+                    <div class="select is-small">
+                      <select v-model="input.type">
+                        <option value="TEXT">Texto</option>
+                        <option value="SELECT">Combo</option>
+                        <option value="MULTIPLE">Multiplas Escolhas</option>
+                        <option value="URL">Link</option>
+                        <option value="IMAGE">Imagem</option>
+                        <option value="DATE">Data</option>
+                      </select>
+                    </div>
+                  </div>
 
-              <label class="checkbox">
-                <input type="checkbox" class="mr-1">Tornar Obrigatório
-              </label>
+                  <div class="column">
+                    <div class="field">
+                      <div class="control is-small has-icons-left">
+                        <input class="input is-small" type="text" v-model="input.title" minlength="6" placeholder="Nome do Campo">
+                        <span class="icon is-small is-left">
+                          <i class="fas fa-font"></i>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="column">
+                    <div class="field">
+                      <div class="control is-small has-icons-left">
+                        <input class="input is-small" type="text" v-model="input.key" minlength="6" placeholder="Chave">
+                        <span class="icon is-small is-left">
+                          <i class="fas fa-code"></i>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="column has-text-right">
+                    <button class="button is-small is-danger mr-2" v-on:click="removeCustomField(index)"><i class="fas fa-times mr-1"></i> Remover</button>
+                    <button class="button is-small is-primary" v-on:click="input.edit_mode = false"><i class="fas fa-check mr-1"></i> Pronto</button>
+                  </div>
+
+                </div>
+                <div class="columns" v-if="input.type == 'MULTIPLE' || input.type == 'SELECT'">
+                  <div class="column is-full">
+                    <p class="is-size-7">
+                      Adicione <strong>um item por linha</strong> separando <strong>Nome do Item</strong> e <strong>Valor do Item</strong> usando <code>:</code> (dois pontos).
+                    </p>
+                    <p class="is-size-7">
+                      Ex: <br>
+                      <code>
+                        "Nome do Item 1:valor_do_item_1"<br>
+                        "Nome do Item 2:valor_do_item_2"
+                      </code>
+                    </p>
+                    <textarea v-model="input.options" class="textarea is-small mt-2" rows="5">
+                    </textarea>
+                  </div>
+                </div>
+
+
+                <label class="checkbox">
+                  <input type="checkbox" class="mr-1" v-model="input.required">Tornar Obrigatório
+                </label>
+              </div>
             </div>
 
 
@@ -143,32 +213,36 @@
           </div>
 
 
-          <div>
+          <div v-if="!form.custom_fields.find(a => a.edit_mode)">
             <div>
-              <button class="button"><i class="fa fa-plus-circle mr-2"></i> Novo campo customizado</button>
+              <button class="button" v-on:click="addCustomField()"><i class="fa fa-plus-circle mr-2"></i> Novo campo customizado</button>
             </div>
 
             <small class="is-size-7 has-text-grey">
-              <i class="fa fa-exclamation-circle mr-1"></i> Será adicionado na edição dos conteúdos deste Tipo de Post.</span>
+              <i class="fa fa-exclamation-circle mr-1"></i> Cria campos personalizados exclusivos para as publicações.</span>
             </small>
           </div>
 
 
         </div><!-- /.column -->
         <div class="column is-3">
+
+          <div class="mb-3 has-text-right" v-if="JSON.stringify(formRef) != JSON.stringify(form)">
+            <a href="javascript:void(0)" class="has-text-danger" v-on:click="discard()">Descartar alterações</a>
+          </div>
+
           <div class="mb-3">
+            <button class="button is-small is-rounded" v-on:click="optionsSEO = !optionsSEO"><i class="fa mr-2" v-bind:class="{'fa-eye-slash': !optionsSEO, 'fa-eye': optionsSEO}"></i> Opções de SEO</button>
+          </div>
+
+          <div class="mb-3" v-if="optionsSEO">
             <input-image :placeholder="'Imagem de capa'"></input-image>
           </div>
           <hr>
           <div class="select mb-3">
-            <select>
-              <option>Conteúdo de Artigos</option>
-            </select>
-          </div>
-          <div class="select mb-3">
-            <select>
-              <option>Exibir conteúdo nas buscas</option>
-              <option>Não exibir conteúdo nas buscas</option>
+            <select v-model="form.show_in_search">
+              <option v-bind:value="1">Exibir conteúdo</option>
+              <option v-bind:value="0">Não exibir conteúdo</option>
             </select>
           </div>
         </div>
@@ -176,5 +250,4 @@
     </div>
   </div>
   <!-- /.hero-body -->
-
-</sectio>
+</section>

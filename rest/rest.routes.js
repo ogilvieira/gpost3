@@ -26,6 +26,7 @@ const User = require("./controllers/User.Rest.Controller");
 const Config = require("./controllers/Config.Rest.Controller");
 const Media = require("./controllers/Media.Rest.Controller");
 const Banner = require("./controllers/Banner.Rest.Controller");
+const ArticlesArea = require("./controllers/ArticlesArea.Rest.Controller");
 
 
 module.exports = (app) => {
@@ -78,6 +79,9 @@ module.exports = (app) => {
 
   router.route("/banner/:id/item/new")
     .post(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Banner.addItem)
+
+  router.route("/articles/:id")
+    .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, ArticlesArea.get)
 
   return router;
 };

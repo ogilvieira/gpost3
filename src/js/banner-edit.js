@@ -77,7 +77,7 @@ if( document.querySelector("[data-vue=banner-edit]") ) {
             });
 
             if( this.MODE == 'new' ) {
-              
+
               setTimeout(() => {
                 window.location.href = "/banners/"+response.data.data.id;
               }, 1000);

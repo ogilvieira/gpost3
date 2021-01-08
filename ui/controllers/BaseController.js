@@ -1,4 +1,4 @@
-const { ConfigSchema } = require("../../core/schemas.js");
+const { ConfigSchema, PostTypeSchema } = require("../../core/schemas.js");
 const AuthModel = require("../../core/models/AuthModel.js");
 const UserModel = require("../../core/models/UserModel.js");
 
@@ -19,6 +19,7 @@ exports.index = async (data, req, res, next) => {
     bodyClasslist: [],
     pageActive: null,
     subPageActive: null,
+    articlesAreas: null,
     config: {},
     breadcrumbs: [
       {
@@ -31,6 +32,8 @@ exports.index = async (data, req, res, next) => {
   data.user = null;
 
   let configs = await ConfigSchema.findAll({'atributes' : ['key_value','key_slug']});
+  let articlesAreas = await PostTypeSchema.findAll({ where: {'system' : 'ARTICLE'}, 'atributes' : ['title','id']});
+  data.SITE.articlesAreas = articlesAreas;
 
   Object.values(configs).map(a => {
     data.SITE.config[a.key_slug] = a.key_value;
