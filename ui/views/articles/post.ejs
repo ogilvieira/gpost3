@@ -132,7 +132,7 @@
 
             <div class="field mb-3">
               <div class="control">
-                <input class="input" type="datetime-local" minlength="6" placeholder="Data de Publicação">
+                <input-datetime v-model="data.publishedDate" class="input"></input-datetime>
               </div>
             </div>
 
@@ -154,35 +154,12 @@
 
             <hr>
 
-            <div class="notification p-2" class="mb-3">
-              <span class="tag is-info">
-                <span class="mr-1">Tag A</span>
-                <button class="delete is-small"></button>
+            <div class="notification p-2" class="mb-3" v-if="data.tags.length">
+              <span class="tag is-info m-1" v-for="tag in data.tags">
+                <span class="mr-1" v-text="tag"></span>
+                <button class="delete is-small" v-on:click="removeTag(tag)"></button>
               </span>
-              <span class="tag is-info">
-                <span class="mr-1">Lorem ipsum, dolor sit amet.</span>
-                <button class="delete is-small"></button>
-              </span>
-              <span class="tag is-info">
-                <span class="mr-1">Lorem, ipsum.</span>
-                <button class="delete is-small"></button>
-              </span>
-              <span class="tag is-info">
-                <span class="mr-1">Lorem ipsum, dolor.</span>
-                <button class="delete is-small"></button>
-              </span>
-              <span class="tag is-info">
-                <span class="mr-1">Tag A</span>
-                <button class="delete is-small"></button>
-              </span>
-              <span class="tag is-info">
-                <span class="mr-1">Lorem.</span>
-                <button class="delete is-small"></button>
-              </span>
-              <span class="tag is-info">
-                <span class="mr-1">blastoise</span>
-                <button class="delete is-small"></button>
-              </span>
+
             </div>
 
             <div class="field">
@@ -190,7 +167,7 @@
                 <span class="icon is-medium is-left">
                   <i class="fas fa-tag"></i>
                 </span>
-                <input class="input" type="text" minlength="6" placeholder="Inserir Tag">
+                <input v-on:keyup="checkTag" class="input" type="text" minlength="6" placeholder="Inserir Tag">
               </div>
               <div>
                 <small class="is-size-7 has-text-grey">

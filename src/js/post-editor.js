@@ -2,14 +2,17 @@ import Vue from "./VueBase.js";
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import "@ckeditor/ckeditor5-build-classic/build/translations/pt-br.js";
 import InputImage from "./components/InputImage.vue";
+import InputDateTimeLocal from "./components/InputDateTimeLocal.vue";
 import UploadAdapter from './UploadAdapter';
+import { isValidDate } from "./utils.js";
 
 if( document.querySelector("[data-vue=post-editor]") ) {
 
   var vm = new Vue({
     el: "[data-vue=post-editor]",
     components: {
-      "input-image": InputImage
+      "input-image": InputImage,
+      "input-datetime": InputDateTimeLocal,
     },
     data: {
       loaded: true,
@@ -69,18 +72,31 @@ if( document.querySelector("[data-vue=post-editor]") ) {
             status: true,
             parent: null,
             customFields: "<div></div>",
-            publishedDate: new Date().toISOString()
+            publishedDate: new Date().toISOString(),
+            tags: []
           }
         }
 
-
-
         this.isProcessing = false;
-
       },
+      checkTag(e) {
+        e.target.value = e.target.value.replace(/,/g,"");
+
+        if(e.keyCode == 188 || e.keyCode == 13 ) {
+
+          if(e.target.value.length < 3 || this.data.tags.indexOf(e.target.value)!=-1){ return; }
+
+          this.data.tags.push(e.target.value);
+          e.target.value = "";
+        }
+      },
+      removeTag( tag ) {
+        let index = this.data.tags.indexOf(tag);
+        if( index == -1 ) { return; }
+        this.data.tags.splice(index,1)
+      }
     },
     created: function() {
-      console.log(this.id, this.posttypeID);
       this.fetchInfo();
     }
   });
