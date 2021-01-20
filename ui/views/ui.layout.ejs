@@ -30,7 +30,6 @@
     <div id="navbarBasicExample" class="navbar-menu" v-bind:class="{'is-active' : showMenu}">
       <div class="navbar-start">
 
-
         <% if (userData && (userData.role == 'dev' || userData.role == 'admin')) { %>
         <a href="/users" class="navbar-item">
           <i class="mr-1 fas fa-users"></i> Usuários
@@ -52,20 +51,24 @@
             <a href="/articles/<%=articleArea.id%>" class="navbar-item">
               Items
             </a>
+            <a href="/articles/<%=articleArea.id%>/categories" class="navbar-item">
+              Categorias
+            </a>
+            <% if (userData && (userData.role == 'dev' || userData.role == 'admin')) { %>
             <hr class="navbar-divider">
-            <a href="/articles/<%=articleArea.id%>/edit" class="navbar-item">
+            <a href="/posttype/<%=articleArea.id%>/edit" class="navbar-item">
               Configurar
             </a>
+          <% } %>
           </div>
         </div>
         <% }) %>
-
-        <% } %>
 
         <% if (userData && userData.role == 'dev') { %>
         <a class="navbar-item" href="/api-docs" target="_blank">
           <i class="mr-1 fas fa-file-code"></i> Docs
         </a>
+        <% } %>
 
         <% if (userData && (userData.role == 'dev' || userData.role == 'admin')) { %>
         <a href="/config" class="navbar-item">
@@ -93,10 +96,11 @@
           </div>
         </div>
       </div>
+
     </div>
   </nav>
-  <% } %>
 
+  <% } %>
 
   <section>
     <% if(SITE.showTitleBar && SITE.title) { %>

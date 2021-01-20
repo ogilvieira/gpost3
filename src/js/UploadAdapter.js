@@ -35,7 +35,7 @@ export default class UploadAdapter {
     const genericErrorText = `Couldn't upload file: ${ file.name }.`;
 
     xhr.addEventListener( 'error', (err) => {
-      console.log('error', err);
+      console.error('error', err);
       reject( genericErrorText )
     });
 

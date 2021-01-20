@@ -52,7 +52,6 @@ function User(data) {
 
     })
 
-
     nameArr.map( a => {
       if( a.split('')[0] ){
         acron.push(a.split('')[0]);

@@ -39,12 +39,12 @@
         </div>
 
         <div class="column has-text-right">
-          <a href="/banners" class="button">
+          <button type="button" class="button is-success" v-bind:class="{'is-loading' : isProcessing }" :disabled="!loaded || JSON.stringify(formRef) == JSON.stringify(form)" v-on:click="save()">
             <span class="icon">
-              <i class="fas fa-caret-left"></i>
+              <i class="fas fa-check"></i>
             </span>
-            <span>Voltar</span>
-          </a>
+            <span>Salvar</span>
+          </button>
         </div>
       </div>
 
@@ -58,15 +58,15 @@
                 <a href="javascript:void(0);" v-on:click="editSlug = true"><span v-text="'/'+form.slug"></span><i class="fas fa-edit ml-1"></i></a>
               </div>
 
-              <div class="control mb-2" v-if="editSlug">
-                <input class="input is-small" v-on:keyup="slugifySlug()" v-model="form.slug" type="text" minlength="3" placeholder="Slug">
+              <div class="control mb-2" v-if="editSlug" v-bind:class="{'is-loading' : isProcessing}">
+                <input class="input is-small" v-on:keyup="form.slug = slugifySlug(form.slug);" v-model="form.slug" type="text" minlength="3" placeholder="Slug">
                 <a class="is-size-7" href="javascript:void(0);" v-on:click="editSlug = false">
                   <span>Terminar edição</span>
                   <i class="fas fa-check ml-1"></i>
                 </a>
               </div>
 
-              <div class="control has-icons-left">
+              <div class="control has-icons-left" v-bind:class="{'is-loading' : isProcessing}">
                 <input class="input" v-model="form.title" type="text" minlength="6" placeholder="Titulo">
                 <span class="icon is-left">
                   <i class="fas fa-heading"></i>
@@ -74,7 +74,7 @@
               </div>
             </div>
 
-            <div class="field" v-if="optionsSEO">
+            <div class="field" v-if="optionsSEO" v-bind:class="{'is-loading' : isProcessing}">
               <div class="control is-small has-icons-left">
                 <input class="input is-small" v-model="form.seo_title" type="text" minlength="6" placeholder="SEO Headline">
                 <span class="icon is-small is-left">
@@ -84,7 +84,7 @@
             </div>
 
             <div class="field">
-              <div class="control is-small">
+              <div class="control is-small" v-bind:class="{'is-loading' : isProcessing}">
                 <textarea class="textarea is-small has-fixed-size" rows="2" v-model="form.description" placeholder="Descrição curta" maxlength="120"></textarea>
               </div>
               <small class="is-size-7 has-text-grey">
@@ -93,7 +93,7 @@
 
             </div>
 
-            <div class="field" v-if="optionsSEO">
+            <div class="field" v-if="optionsSEO" v-bind:class="{'is-loading' : isProcessing}">
               <div class="control is-small">
                 <textarea class="textarea is-small has-fixed-size" rows="2" v-model="form.seo_description" placeholder="Descrição curta para SEO" maxlength="120"></textarea>
               </div>
@@ -106,38 +106,54 @@
           </div> <!-- /.box -->
 
 
-          <div>
-
-            <div class="box mb-3" v-for="(input,index) in form.custom_fields">
+          <draggable v-model="form.custom_fields" dragable=".box" v-if="typeof form.custom_fields == 'object' && form.custom_fields.length && !isProcessing" handle=".handle">
+            <transition-group>
+              <div class="box mb-3" v-for="(input,index) in form.custom_fields" :key="input.randomIndex">
 
               <div v-if="!input.edit_mode">
                 <div class="columns">
                   <div class="column">
-                      Texto
+                    <div><strong v-text="input.title"></strong></div>
+                    <span class="is-size-7" v-text="input.type"></span>
+                  </div>
+
+
+                  <div class="column">
+                    <code><i class="fas fa-code mr-1"></i> <span v-text="input.key"></span></code>
                   </div>
 
                   <div class="column">
-                    <span v-text="input.title"></span>
-                  </div>
-
-                  <div class="column">
-                    <code v-text="input.key"></code>
+                    <strong class="is-size-7 tag is-danger" v-if="input.required">Campo Obrigatório</strong>
                   </div>
 
                   <div class="column has-text-right">
-                    <button class="button is-small" v-on:click="input.edit_mode = true"><i class="fas fa-edit mr-1"></i> Editar</button>
+                    <button class="button is-small is-primary" v-on:click="editCustomInput(input)"><i class="fas fa-edit mr-1"></i> Editar</button>
+                    <div class="button is-small handle is-movable" title="Ordernar"><i class="fas fa-arrows-alt"></i></div>
                   </div>
 
                 </div>
+
                 <div class="columns" v-if="input.type == 'MULTIPLE' || input.type == 'SELECT'">
                   <div class="column is-full">
-                    <span v-text="input.options"></span>
+                    <table class="table is-bordered is-small is-striped is-fullwidth mt-2 mb-2 is-size-7
+                    ">
+                      <thead>
+                        <tr>
+                          <th>Nome</th>
+                          <th>Valor</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        <tr v-for="(option, index) in serializeOptions(input.options)">
+                          <td>{{option[0]}}</td>
+                          <td><code>{{option[1]}}</code></td>
+                        </tr>
+                      </tbody>
+
+                    </table>
                   </div>
                 </div>
-
-
-                <strong class="is-size-7" v-if="input.required">Campo Obrigatório</strong>
-
 
               </div>
 
@@ -158,7 +174,7 @@
 
                   <div class="column">
                     <div class="field">
-                      <div class="control is-small has-icons-left">
+                      <div class="control is-small has-icons-left" v-bind:class="{'is-loading' : isProcessing}">
                         <input class="input is-small" type="text" v-model="input.title" minlength="6" placeholder="Nome do Campo">
                         <span class="icon is-small is-left">
                           <i class="fas fa-font"></i>
@@ -169,8 +185,8 @@
 
                   <div class="column">
                     <div class="field">
-                      <div class="control is-small has-icons-left">
-                        <input class="input is-small" type="text" v-model="input.key" minlength="6" placeholder="Chave">
+                      <div class="control is-small has-icons-left" v-bind:class="{'is-loading' : isProcessing}">
+                        <input class="input is-small" type="text" v-model="input.key" minlength="6" placeholder="Chave" v-on:keyup="input.key = slugifySlug(input.key);">
                         <span class="icon is-small is-left">
                           <i class="fas fa-code"></i>
                         </span>
@@ -180,7 +196,7 @@
 
                   <div class="column has-text-right">
                     <button class="button is-small is-danger mr-2" v-on:click="removeCustomField(index)"><i class="fas fa-times mr-1"></i> Remover</button>
-                    <button class="button is-small is-primary" v-on:click="input.edit_mode = false"><i class="fas fa-check mr-1"></i> Pronto</button>
+                    <button class="button is-small is-primary" v-on:click="saveCustomInput(input)"><i class="fas fa-check mr-1"></i> Pronto</button>
                   </div>
 
                 </div>
@@ -192,8 +208,25 @@
                     <p class="is-size-7">
                       Ex: <br>
                       <code>
-                        "Nome do Item 1:valor_do_item_1"<br>
-                        "Nome do Item 2:valor_do_item_2"
+                        Nome do Item 1:valor_do_item_1<br>
+                        Nome do Item 2:valor_do_item_2
+                      </code>
+                    </p>
+                    <textarea v-model="input.options" class="textarea is-small mt-2" rows="5">
+                    </textarea>
+                  </div>
+                </div>
+
+                <div class="columns" v-if="input.type == 'TEXT'">
+                  <div class="column is-full">
+                    <p class="is-size-7">
+                      Adicione <strong>um item por linha</strong> separando <strong>Nome do Item</strong> e <strong>Valor do Item</strong> usando <code>:</code> (dois pontos).
+                    </p>
+                    <p class="is-size-7">
+                      Ex: <br>
+                      <code>
+                        Nome do Item 1:valor_do_item_1<br>
+                        Nome do Item 2:valor_do_item_2
                       </code>
                     </p>
                     <textarea v-model="input.options" class="textarea is-small mt-2" rows="5">
@@ -206,11 +239,9 @@
                   <input type="checkbox" class="mr-1" v-model="input.required">Tornar Obrigatório
                 </label>
               </div>
-            </div>
-
-
-
-          </div>
+              </div>
+            </transition-group>
+          </draggable>
 
 
           <div v-if="!form.custom_fields.find(a => a.edit_mode)">
@@ -227,7 +258,7 @@
         </div><!-- /.column -->
         <div class="column is-3">
 
-          <div class="mb-3 has-text-right" v-if="JSON.stringify(formRef) != JSON.stringify(form)">
+          <div class="mb-3 has-text-right" v-if="JSON.stringify(formRef) != JSON.stringify(form) && !isProcessing">
             <a href="javascript:void(0)" class="has-text-danger" v-on:click="discard()">Descartar alterações</a>
           </div>
 
@@ -241,8 +272,8 @@
           <hr>
           <div class="select mb-3">
             <select v-model="form.show_in_search">
-              <option v-bind:value="1">Exibir conteúdo</option>
-              <option v-bind:value="0">Não exibir conteúdo</option>
+              <option v-bind:value="true">Exibir conteúdo</option>
+              <option v-bind:value="false">Não exibir conteúdo</option>
             </select>
           </div>
         </div>

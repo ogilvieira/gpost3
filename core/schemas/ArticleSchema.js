@@ -16,6 +16,9 @@ module.exports = function(sequelize, DataTypes) {
     seoTitle: {
       type: DataTypes.STRING
     },
+    seoDescription: {
+      type: DataTypes.STRING
+    },
     cover: {
       type: DataTypes.STRING
     },

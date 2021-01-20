@@ -1,6 +1,6 @@
 <% layout('../ui.layout') -%>
 
-<section data-vue="post-editor" v-cloak>
+<section data-vue="post-editor" data-posttype="<%=posttype%>" data-id="<%=ID%>" v-cloak>
 
   <div class="hero">
      <div class="hero-body">
@@ -18,7 +18,7 @@
           <div class="column">
             <div class="notification">
               Nenhum item encontrado.
-              <button class="button is-rounded is-small">
+              <button class="button is-rounded is-small" v-on:click="fetchInfo()">
                 <span class="icon">
                   <i class="fas fa-sync-alt"></i>
                 </span>
@@ -33,18 +33,18 @@
 
 
 
-      <div class="container" v-if="loaded">
+      <div class="container" v-if="loaded && data">
         <div class="columns">
           <div class="column is-9">
 
             <div class="mb-3">
               <button class="button is-small is-success" v-bind:class="{'is-loading' : isProcessing }"><i class="fa fa-save mr-1"></i> Salvar e sair</button>
               <button class="button is-small is-info" v-bind:class="{'is-loading' : isProcessing }"><i class="fa fa-pen-square mr-1"></i> Salvar e continuar editando</button>
-              <button class="button is-small is-danger is-light" v-bind:class="{'is-loading' : isProcessing }"><i class="fa fa-times mr-1"></i> Cancelar Edição</button>
+              <button class="button is-small is-danger is-light" v-bind:class="{'is-loading' : isProcessing }"><i class="fa fa-times mr-1"></i> Descartar Alterações</button>
             </div>
 
 
-            <div class="notification is-small notification-warning p-2">
+            <div v-if="isCached" class="notification is-small notification-warning p-2">
               <div class="mb-2">
                 <div class="is-size-7"><i class="fa fa-exclamation-circle"></i> Você esta editando uma cópia de segurança</div>
                 <p class="is-size-7">
@@ -58,63 +58,73 @@
             <div class="box">
 
               <div class="field">
-                <div class="is-size-7 m-1">
-                  <a href="javascript:void(0);"><span>/posts/category-slug/article-slug</span><i class="fas fa-edit ml-1"></i></a>
+                <div class="is-size-7 m-1" v-if="data.slug">
+                  <a href="javascript:void(0);"><span v-text="data.slug"></span><i class="fas fa-edit ml-1"></i></a>
                 </div>
                 <div class="control has-icons-left">
                   <span class="icon is-medium is-left">
                     <i class="fas fa-heading"></i>
                   </span>
-                  <input class="input" type="text" minlength="6" placeholder="Headline">
+                  <input class="input" type="text" minlength="6" placeholder="Headline" v-model="data.title">
                 </div>
               </div>
 
-              <div class="field">
-                <div class="control is-small has-icons-left">
-                  <input class="input is-small" type="text" minlength="6" placeholder="SEO Headline">
-                  <span class="icon is-small is-left">
-                    <i class="fas fa-heading"></i>
-                  </span>
-                </div>
-              </div>
-
-              <div class="field">
-                <div class="control is-small has-icons-left">
-                  <input class="input is-small" type="text" minlength="6" placeholder="SEO Headline">
-                  <span class="icon is-small is-left">
-                    <i class="fas fa-heading"></i>
-                  </span>
-                </div>
-              </div>
 
               <div class="field">
                 <div class="control is-small">
-                  <textarea class="textarea is-small has-fixed-size" rows="2" placeholder="Descrição curta" maxlength="120"></textarea>
+                  <textarea class="textarea is-small has-fixed-size" rows="2" placeholder="Descrição curta" maxlength="120" v-model="data.description"></textarea>
                 </div>
                 <small class="is-size-7 has-text-grey">
-                  <i class="fa fa-keyboard mr-1"></i> <span><span>0</span>/120 caracteres.</span>
+                  <i class="fa fa-keyboard mr-1"></i> <span><span v-text="data.description.length"></span>/120 caracteres.</span>
                 </small>
-
               </div>
-              <ckeditor :editor="editor" v-model="editorData" :config="editorConfig"></ckeditor>
+
+              <div class="notification" v-if="showOptionsSEO">
+
+                <p class="is-size-7 mb-2">
+                  <strong>Title e Description:</strong>
+                </p>
+
+                <div class="field" v-if="showOptionsSEO">
+                  <div class="control is-small has-icons-left">
+                    <input class="input is-small" type="text" minlength="6" placeholder="SEO Headline">
+                    <span class="icon is-small is-left">
+                      <i class="fas fa-heading"></i>
+                    </span>
+                  </div>
+                </div>
+
+                <div class="field" v-if="showOptionsSEO">
+                  <div class="control is-small">
+                    <textarea class="textarea is-small has-fixed-size" rows="2" placeholder="SEO Meta Description" maxlength="120" v-model="data.seoDescription"></textarea>
+                  </div>
+                  <small class="is-size-7 has-text-grey">
+                    <i class="fa fa-keyboard mr-1"></i> <span><span v-text="data.seoDescription.length"></span>/120 caracteres.</span>
+                  </small>
+                </div>
+              </div>
+
+              <ckeditor :editor="editor" v-model="data.content" :config="editorConfig"></ckeditor>
             </div>
 
-
-            <div>
-              <button class="button"><i class="fa fa-user-edit mr-2"></i> Edições avançadas de SEO</button>
-            </div>
           </div>
 
           <div class="column is-3">
+
+            <div class="mb-3">
+              <button class="button is-small is-rounded" v-on:click="showOptionsSEO = !showOptionsSEO"><i class="fa mr-2" v-bind:class="{'fa-eye-slash': !showOptionsSEO, 'fa-eye': showOptionsSEO}"></i> Opções de SEO</button>
+            </div>
+
+
             <div class="mb-3">
               <input-image :placeholder="'Imagem de capa'"></input-image>
             </div>
             <hr>
 
             <div class="select mb-3">
-              <select>
-                <option>Rascunho</option>
-                <option>Publicado</option>
+              <select v-model="data.status">
+                <option v-bind:value="false">Rascunho</option>
+                <option v-bind:value="true">Publicado</option>
               </select>
             </div>
 
@@ -122,7 +132,7 @@
 
             <div class="field mb-3">
               <div class="control">
-                <input class="input" type="datetime-local" minlength="6" placeholder="Headline">
+                <input class="input" type="datetime-local" minlength="6" placeholder="Data de Publicação">
               </div>
             </div>
 

@@ -81,10 +81,9 @@ module.exports = {
       }
 
       if( this.localMin && new Date(val).getTime() < new Date(this.hasDatePicker ? this.localMin : this.setFormatInText(this.localMin)).getTime() ) {
-        console.log('is min');
         this.localValue = this.parseDate(new Date(this.hasDatePicker ? this.localMin : this.setFormatInText(this.localMin)).toISOString());
         this.$emit('input', new Date(this.hasDatePicker ? this.localMin : this.setFormatInText(this.localMin)).toISOString());
-        return; 
+        return;
       }
 
       if( this.localMax && new Date(val).getTime() > new Date(this.hasDatePicker ? this.localMax : this.setFormatInText(this.localMax)).getTime() ) {
@@ -97,7 +96,7 @@ module.exports = {
     parseDate( val ) {
       if( this.hasDatePicker ) {
         return moment(val).format('YYYY-MM-DDTHH:mm');
-      } else { 
+      } else {
         return moment(val || new Date()).format("DD-MM-YYYY HH:mm");
       }
     },

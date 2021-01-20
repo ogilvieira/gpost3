@@ -1,11 +1,11 @@
 exports.index = async (data, req, res, next) => {
-  data.SITE.title = "Articles";
+  data.SITE.title = "Posts";
   return res.render('articles/articles', data);
 }
 
-exports.edit = async (data, req, res, next) => {
-  data.SITE.title = "Configurar";
-  return res.render('articles/edit', data);
+exports.editPosttype = async (data, req, res, next) => {
+  data.SITE.title = "Configurar Post Type";
+  return res.render('articles/posttype-edit', data);
 }
 
 exports.categories = async (data, req, res, next) => {
@@ -14,11 +14,15 @@ exports.categories = async (data, req, res, next) => {
 }
 
 exports.postNew = async (data, req, res, next) => {
-  data.SITE.title = "Post";
+  data.SITE.title = "Novo Post";
+  data.posttype = req.params.posttypeID;
+  data.ID = "new";
   return res.render('articles/post', data);
 }
 
 exports.postEdit = async (data, req, res, next) => {
-  data.SITE.title = "Post";
+  data.SITE.title = "Editar Post";
+  data.posttype = req.params.posttypeID;
+  data.ID = "new";
   return res.render('articles/post', data);
 }

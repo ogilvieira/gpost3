@@ -67,9 +67,6 @@ module.exports = (app) => {
     .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Banner.get)
     .put(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, Banner.update)
 
-  router.route("/public/banner/:id")
-    .get(Banner.getItemsPublic);
-
   router.route("/banner/:id/items")
     .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Banner.getItems)
 
@@ -80,8 +77,16 @@ module.exports = (app) => {
   router.route("/banner/:id/item/new")
     .post(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Banner.addItem)
 
-  router.route("/articles/:id")
-    .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, ArticlesArea.get)
+  router.route("/posttype/:id")
+    .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, ArticlesArea.get)
+    .put(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, ArticlesArea.update)
+
+  //PUBLIC
+  router.route("/public/banner/:id")
+    .get(Banner.getItemsPublic);
+
+  router.get("/public/posttype", ArticlesArea.listPublic);
+  router.get("/public/posttype/:slug", ArticlesArea.getPublic);
 
   return router;
 };

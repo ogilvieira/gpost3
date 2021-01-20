@@ -24,7 +24,7 @@ exports.scorePassword = (pass) => {
   for (var check in variations) {
       variationCount += (variations[check] == true) ? 1 : 0;
   }
-  
+
   score += (variationCount - 1) * 10;
 
   return parseInt(score);
@@ -35,7 +35,7 @@ exports.isValidUrl = (string) => {
   try {
     new URL(string);
   } catch (_) {
-    return false;  
+    return false;
   }
 
   return true;
@@ -82,3 +82,7 @@ exports.isDateTimeSupported = () => {
 exports.isValidDate = (d) => {
   return d instanceof Date && !isNaN(d);
 }
+
+exports.randomInt = (min, max) => {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+};

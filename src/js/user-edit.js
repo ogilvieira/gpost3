@@ -102,7 +102,7 @@ if( document.querySelector("[data-vue=user-edit]") ) {
             });
 
             if( this.MODE == 'new' ) {
-              
+
               setTimeout(() => {
                 window.location.href = "/users/"+response.data.data.id;
               }, 1000);
@@ -132,7 +132,6 @@ if( document.querySelector("[data-vue=user-edit]") ) {
       this.$http.get('/rest/account')
         .then(res => {
           this.userInfo = res.data;
-          console.log(this.userInfo);
         })
 
 

@@ -283,13 +283,9 @@ if( document.querySelector("[data-vue=banner-items]") ) {
         if(!this.uploadStepItems) {
           this.isUploading = false;
           this.uploadStep = 0;
-          console.log("Completado");
-          console.log(this.uploadErros)
           if(!this.uploadErros.length) { this.fetchInfo(); }
           return;
         }
-
-        console.log("Try to update: ", this.uploadStepItems);
 
 
         itemsToUpdate.map(a => {
