@@ -1,6 +1,6 @@
 <template>
-  <input v-if="hasDatePicker" :value="localValue" :class="className" type="datetime-local" v-on:change="setVal($event.target.value)" v-on:blur="checkInput($event.target.value)" :min="localMin" :max="localMax">
-  <input v-else v-model="localValue" :class="className" type="text" v-mask="'##/##/#### ##:##'" placeholder="DD/MM/YYYY HH:MM" v-on:blur="checkInput($event.target.value)">
+  <input v-if="hasDatePicker" :value="localValue" :class="className" type="datetime-local" v-on:change="setVal($event.target.value)" v-on:blur="checkInput($event.target.value)" :min="localMin" :max="localMax" :disabled="disabled">
+  <input v-else v-model="localValue" :class="className" type="text" v-mask="'##/##/#### ##:##'" placeholder="DD/MM/YYYY HH:MM" v-on:blur="checkInput($event.target.value)" :disabled="disabled">
 </template>
 <script>
 const hasDatePicker = require("../utils").isDateTimeSupported();
@@ -119,12 +119,12 @@ module.exports = {
   },
   created: function() {
 
-    if( !this.isValidDate(new Date(this.value)) ) {
+    if( this.value && !this.isValidDate(new Date(this.value)) ) {
       this.value = new Date().toISOString();
       this.$emit('input', this.value);
     }
 
-    this.localValue = this.parseDate(this.value);
+    this.localValue = this.value ? this.parseDate(this.value) : "";
     this.localMax = this.getMinMax(this.max, 'max');
     this.localMin = this.getMinMax(this.min, 'min');
   },

@@ -34,6 +34,9 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       defaultValue: "1"
     },
+    category: {
+      type: DataTypes.STRING
+    },
     author: {
       type: DataTypes.STRING,
       allowNull: false

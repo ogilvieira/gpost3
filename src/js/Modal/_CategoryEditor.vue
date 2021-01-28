@@ -48,7 +48,7 @@ module.exports = {
   props: {
     options: {
       id: null,
-      parent: null
+      postTypeID: null
     },
   },
   data: function () {
@@ -133,15 +133,27 @@ module.exports = {
       this.isProcessing = true;
 
 
-      this.$http[this.options.id ? 'put' : 'post'](`/rest/posttype/${this.options.parent}/categories?title=${this.data.title}&description=${this.data.description}`)
+      let url = (this.options.id ? `/rest/category/${this.options.id}` : `/rest/category`);
+
+      let params = {
+        title: this.data.title,
+        description: this.data.description,
+        postTypeID: this.options.postTypeID
+      };
+
+      this.$http[this.options.id ? 'put' : 'post'](url, null, {
+        params: params
+      })
         .then(res => {
           this.$toast.open({
             message: res.data && res.data.message ? res.data.message : "",
           });
+
+          window.dispatchEvent(new CustomEvent("category:update"));
+
           this.$emit('close');
         })
         .catch(err => {
-          console.error(err);
           if( err.models ) {
             Object.keys(err.models).map(a => {
               this.errors.push({ model: a, message: err.models[a] })
@@ -159,9 +171,9 @@ module.exports = {
     }
   },
   mounted() {
-    if(!this.options.parent){
-      this.$toast.error('Parent posttype\'s id is required.');
-      console.error('Parent posttype\'s id is required.');
+    if(!this.options.postTypeID){
+      this.$toast.error('postTypeID is required.');
+      console.error('postTypeID is required.');
       this.$emit("close");
     }
 

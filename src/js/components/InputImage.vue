@@ -2,12 +2,12 @@
   <div class="file-image-wrap">
     <figure class="image" v-if="!!value || !!imageBase64">
       <img :src="typeof value == 'string' ? value : imageBase64">
-      <button v-if="typeof value == 'object' || candelete" class="delete is-large" v-on:click="removeFile()" :disabled="disabled || isProcessing">remove</button>
+      <button v-if="typeof value == 'object' || candelete" class="delete is-large" v-on:click="removeFile()" :disabled="isProcessing || disabled">remove</button>
     </figure>
 
     <div class="file is-boxed is-centered m-3" v-if="!value && (!value && !imageBase64)" v-bind:class="{'is-info' : !invalid, 'is-danger' : invalid}">
       <label class="file-label">
-        <input class="file-input" type="file" ref="file" name="image" :required="required" v-on:input="uploadImage($event.target.value)" accept="image/*" :disabled="disabled || isProcessing">
+        <input class="file-input" type="file" ref="file" name="image" :required="required" v-on:input="uploadImage($event.target.value)" accept="image/*" :disabled="isProcessing || disabled">
         <span class="file-cta">
           <span class="file-icon">
             <i class="fas fa-cloud-upload-alt"></i>

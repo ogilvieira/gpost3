@@ -3,7 +3,8 @@ import VueToast from "vue-toast-notification";
 import axios from 'axios'
 import VueTheMask from "vue-the-mask";
 import CKEditor from "@ckeditor/ckeditor5-vue";
-
+const moment = require("moment");
+require('moment/locale/pt-br')
 
 //set default plugins and configs for Vuejs
 Vue.use(VueToast, {
@@ -11,6 +12,7 @@ Vue.use(VueToast, {
   duration: 5000,
 });
 
+Vue.use(require("vue-moment"), { moment });
 Vue.use(VueTheMask);
 
 // Add a request interceptor
