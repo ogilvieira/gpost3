@@ -1,4 +1,5 @@
 import Vue from "./VueBase.js";
+import slugify from "slugify";
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import "@ckeditor/ckeditor5-build-classic/build/translations/pt-br.js";
 import InputImage from "./components/InputImage.vue";
@@ -42,6 +43,7 @@ if( document.querySelector("[data-vue=post-editor]") ) {
       isProcessing: true,
       isLoaded: false,
       rawData: null,
+      editSlug: false,
       data: null,
       postType: null,
       categories: [],
@@ -206,11 +208,36 @@ if( document.querySelector("[data-vue=post-editor]") ) {
           }
         }
       },
+      getPath() {
+
+        let a = [];
+
+        if( this.postType ) {
+          a.push(this.postType.slug);
+        }
+
+        if( this.categories && this.data.category ) {
+          let cat = this.categories.find(b => b.id == this.data.category);
+          a.push(cat.slug);
+        }
+
+        if( this.data.slug ) {
+          a.push(this.data.slug);
+        }
+
+        return '/'+a.join("/");
+      },
+      slugifySlug: function( val ){
+        val = slugify(val, {
+          replacement: '-',
+          lower: true,
+          remove: /[*+~.()'"!:@]/g
+        });
+
+        return val;
+      },
       save( exit = true ) {
         this.isProcessing = true;
-
-
-        console.log(this.data);
 
         this.savedLocalDataAction('discard');
         this.fetchInfo();
