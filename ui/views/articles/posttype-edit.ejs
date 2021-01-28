@@ -217,24 +217,6 @@
                   </div>
                 </div>
 
-                <div class="columns" v-if="input.type == 'TEXT'">
-                  <div class="column is-full">
-                    <p class="is-size-7">
-                      Adicione <strong>um item por linha</strong> separando <strong>Nome do Item</strong> e <strong>Valor do Item</strong> usando <code>:</code> (dois pontos).
-                    </p>
-                    <p class="is-size-7">
-                      Ex: <br>
-                      <code>
-                        Nome do Item 1:valor_do_item_1<br>
-                        Nome do Item 2:valor_do_item_2
-                      </code>
-                    </p>
-                    <textarea v-model="input.options" class="textarea is-small mt-2" rows="5">
-                    </textarea>
-                  </div>
-                </div>
-
-
                 <label class="checkbox">
                   <input type="checkbox" class="mr-1" v-model="input.required">Tornar Obrigatório
                 </label>

@@ -88,7 +88,6 @@ if( document.querySelector("[data-vue=banner-edit]") ) {
 
           })
           .catch( response => {
-            console.log(response);
             if( response.models ) {
               Object.keys(response.models).map(a => {
                 this.errors.push({ model: a, message: response.models[a] })

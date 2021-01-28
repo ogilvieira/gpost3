@@ -168,7 +168,6 @@ if( document.querySelector("[data-vue=posttype-edit]") ) {
       save: function() {
         this.isProcessing = true;
 
-
         this.$http.put(`/rest/posttype/${this.areaID}`, this.form)
           .then(res => {
             console.log(res)
@@ -180,8 +179,6 @@ if( document.querySelector("[data-vue=posttype-edit]") ) {
           .then(res => {
             this.isProcessing = false;
           });
-
-
       }
     },
     created: function() {

@@ -31,16 +31,14 @@
         </div>
       </div>
 
-
-
-      <div class="container" v-if="loaded && data">
+      <div class="container" v-if="loaded && data && postType">
         <div class="columns">
           <div class="column is-9">
 
             <div class="mb-3">
               <button class="button is-small is-success" v-bind:class="{'is-loading' : isProcessing }"><i class="fa fa-save mr-1"></i> Salvar e sair</button>
               <button class="button is-small is-info" v-bind:class="{'is-loading' : isProcessing }"><i class="fa fa-pen-square mr-1"></i> Salvar e continuar editando</button>
-              <button class="button is-small is-danger is-light" v-bind:class="{'is-loading' : isProcessing }"><i class="fa fa-times mr-1"></i> Descartar Alterações</button>
+              <button v-if="id != 'new'" class="button is-small is-danger is-light" v-bind:class="{'is-loading' : isProcessing }"><i class="fa fa-times mr-1"></i> Descartar Alterações</button>
             </div>
 
 
@@ -105,6 +103,73 @@
               </div>
 
               <ckeditor :editor="editor" v-model="data.content" :config="editorConfig"></ckeditor>
+
+
+              <div v-if="postType && postType.custom_fields">
+                <hr>
+                <h2 class="subtitle">Campos Extras</h2>
+
+                <div v-for="customField in postType.custom_fields">
+
+                  <div class="field mb-5" v-if="customField.type == 'TEXT'">
+                    <label class="label" v-text="customField.title"></label>
+                    <div class="control">
+                      <input class="input" type="text" v-model="data.customFields[customField.key]">
+                    </div>
+                    <strong class="is-size-7 tag is-danger" v-if="customField.required">Campo Obrigatório</strong>
+                  </div>
+
+                  <div class="field mb-5" v-if="customField.type == 'URL'">
+                    <label class="label" v-text="customField.title"></label>
+                    <div class="control">
+                      <input class="input" type="url" v-model="data.customFields[customField.key]" placeholder="http://...">
+                    </div>
+                    <strong class="is-size-7 tag is-danger" v-if="customField.required">Campo Obrigatório</strong>
+                  </div>
+
+
+                  <div class="field mb-5" v-if="customField.type == 'MULTIPLE'">
+                    <label class="label" v-text="customField.title"></label>
+                    <div class="buttons">
+                      <button class="button" v-for="option in customField.options.split('\n')">{{option.split(':')[0]}}</button>
+                    </div>
+                    <strong class="is-size-7 tag is-danger" v-if="customField.required">Campo Obrigatório</strong>
+                  </div>
+
+                  <div class="field mb-5" v-if="customField.type == 'SELECT'">
+                    <label class="label" v-text="customField.title"></label>
+
+                    <div class="control">
+                      <div class="select">
+                        <select v-model="data.customFields[customField.key]">
+                          <option :value="''">---</option>
+                          <option v-for="option in customField.options.split('\n')" :value="option.split(':')[0] || option.split(':')[1]">{{option.split(':')[0]}}</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <strong class="is-size-7 tag is-danger" v-if="customField.required">Campo Obrigatório</strong>
+                  </div>
+
+                  <div class="field mb-5" v-if="customField.type == 'DATE'">
+                    <label class="label" v-text="customField.title"></label>
+                    <div class="control">
+                      <input-datetime class="input"/>
+                    </div>
+                  </div>
+
+                  <div class="field mb-5" v-if="customField.type == 'IMAGE'">
+                    <label class="label" v-text="customField.title"></label>
+                    <input-image/>
+                  </div>
+
+
+                </div>
+
+              </div>
+
+
+
             </div>
 
           </div>
@@ -139,17 +204,17 @@
             <hr>
 
             <div class="mb-3">
-              <div class="select">
-                <select>
-                  <option>Sem Categoria</option>
-                  <option>Categoria A</option>
-                  <option>Categoria B</option>
-                  <option>Categoria C</option>
-                  <option>Categoria D</option>
-                  <option>Categoria E</option>
+              <div class="select mb-2">
+                <select v-model="data.parent">
+                  <option :value="''">Sem Categoria</option>
+                  <option v-for="cat in categories" :value="cat.id" v-text="cat.title"></option>
                 </select>
               </div>
-              <a href="javascript:void(0);" class="is-size-7">Editar categorias<i class="fa fa-edit ml-1"></i></a>
+
+              <div class="mb-2">
+                <button class="button is-small mr-2" v-if="data.parent" v-on:click="openCategoryEditor(data.parent || null)"><i class="fa fa-edit mr-1"></i> Editar</button>
+                <button class="button is-small is-info" v-on:click="openCategoryEditor()"><i class="fa fa-edit mr-1"></i> Nova</button>
+              </div>
             </div>
 
             <hr>
@@ -183,4 +248,8 @@
      </div>
    </div>
 
+
+   <pre v-text="data">
+
+   </pre>
 </section>

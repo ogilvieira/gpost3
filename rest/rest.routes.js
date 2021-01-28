@@ -27,6 +27,7 @@ const Config = require("./controllers/Config.Rest.Controller");
 const Media = require("./controllers/Media.Rest.Controller");
 const Banner = require("./controllers/Banner.Rest.Controller");
 const ArticlesArea = require("./controllers/ArticlesArea.Rest.Controller");
+const Category = require("./controllers/Category.Rest.Controller");
 
 
 module.exports = (app) => {
@@ -80,6 +81,14 @@ module.exports = (app) => {
   router.route("/posttype/:id")
     .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, ArticlesArea.get)
     .put(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, ArticlesArea.update)
+
+  router.route("/posttype/:id/categories")
+    .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Category.getAll)
+    .post(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Category.post)
+
+  //Category
+  router.route("/category/:id")
+    .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Category.get)
 
   //PUBLIC
   router.route("/public/banner/:id")

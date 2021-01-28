@@ -1,5 +1,5 @@
 "use strict"
-module.exports = function(sequelize, DataTypes) { 
+module.exports = function(sequelize, DataTypes) {
   // Define resource
   var Taxonomy = sequelize.define('taxonomy', {
     title: {
@@ -7,8 +7,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     },
     description: {
-      type: DataTypes.STRING,
-      allowNull: false
+      type: DataTypes.STRING
     },
     slug: {
       type: DataTypes.STRING,
@@ -33,7 +32,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     lang: {
       type: DataTypes.STRING,
-      defaultValue: 'pt-br'      
+      defaultValue: 'pt-br'
     }
   });
 

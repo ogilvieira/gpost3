@@ -5,6 +5,7 @@ import InputImage from "./components/InputImage.vue";
 import InputDateTimeLocal from "./components/InputDateTimeLocal.vue";
 import UploadAdapter from './UploadAdapter';
 import { isValidDate } from "./utils.js";
+import Modal from "./Modal/Modal.js";
 
 if( document.querySelector("[data-vue=post-editor]") ) {
 
@@ -39,6 +40,8 @@ if( document.querySelector("[data-vue=post-editor]") ) {
       isProcessing: false,
       isLoaded: false,
       data: null,
+      postType: null,
+      categories: [],
     },
     props: {
       id: {
@@ -58,7 +61,10 @@ if( document.querySelector("[data-vue=post-editor]") ) {
       fetchInfo() {
         this.isProcessing = true;
 
-        let proms = [];
+        let proms = [
+          this.$http.get(`/rest/posttype/${this.posttypeID}`),
+          this.$http.get(`/rest/posttype/${this.posttypeID}/categories`),
+        ];
 
         if( this.id == 'new' ) {
           this.data = {
@@ -68,16 +74,36 @@ if( document.querySelector("[data-vue=post-editor]") ) {
             seoTitle: "",
             seoDescription: "",
             cover: "",
-            content: "",
-            status: true,
-            parent: null,
-            customFields: "<div></div>",
+            content: "<div></div>",
+            status: false,
+            parent: "",
+            customFields: {},
             publishedDate: new Date().toISOString(),
             tags: []
           }
         }
 
-        this.isProcessing = false;
+
+        Promise.all(proms)
+          .then(res => {
+            this.postType = res[0].data;
+
+            if( this.postType.custom_fields ){
+              this.postType.custom_fields.map(a => {
+                this.data.customFields[a.key] = '';
+              });
+            }
+
+            this.categories = res[1].data || [];
+
+          })
+          .catch(err => {
+            console.error(err);
+          })
+          .then(() => {
+            this.isProcessing = false;
+          })
+
       },
       checkTag(e) {
         e.target.value = e.target.value.replace(/,/g,"");
@@ -94,6 +120,9 @@ if( document.querySelector("[data-vue=post-editor]") ) {
         let index = this.data.tags.indexOf(tag);
         if( index == -1 ) { return; }
         this.data.tags.splice(index,1)
+      },
+      openCategoryEditor( id = null ) {
+        Modal.open('CATEGORY_EDITOR', { id: id, parent: this.posttypeID })
       }
     },
     created: function() {
