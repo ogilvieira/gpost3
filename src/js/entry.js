@@ -10,5 +10,6 @@ import "./config-list.js";
 import "./banner-list.js";
 import "./banner-edit.js";
 import "./banner-items.js";
+import "./post-list.js";
 import "./post-editor.js";
 import "./posttype-edit.js";

@@ -20,7 +20,7 @@ function TaxonomyModel(data) {
   this.system = data.system || "ARTICLE";
   this.parent = data.parent || null;
   this.type = data.type || "CATEGORY";
-  this.slug_key = data.slug_key || `${this.slug||""}${this.type||""}${this.system||""}${this.parent||""}`.toLowerCase();
+  this.slug_key = `${this.slug||""}${this.type||""}${this.system||""}${this.parent||""}`.toLowerCase();
 }
 
 module.exports = TaxonomyModel;

@@ -13,10 +13,10 @@ module.exports = function(sequelize, DataTypes) {
     slug: {
       type: DataTypes.STRING
     },
-    seoTitle: {
+    seo_title: {
       type: DataTypes.STRING
     },
-    seoDescription: {
+    seo_description: {
       type: DataTypes.STRING
     },
     cover: {
@@ -41,7 +41,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false
     },
-    slugKey: {
+    slug_key: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true
@@ -49,21 +49,26 @@ module.exports = function(sequelize, DataTypes) {
     tags: {
       type: DataTypes.TEXT
     },
-    customFields: {
+    custom_fields: {
       type: DataTypes.TEXT
     },
-    publishedDate: {
+    published_date: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW
     },
-    isEditingBy: {
+    is_editing_by: {
       type: DataTypes.STRING
     },
     lang: {
       type: DataTypes.STRING,
       defaultValue: 'pt-br'
     }
+  });
+
+  Article.addHook('beforeValidate', async (article, options) => {
+    article.custom_fields = JSON.stringify(article.custom_fields);
+    article.tags = article.tags.join(",");
   });
 
   Article.sync();

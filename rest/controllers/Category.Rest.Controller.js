@@ -7,10 +7,11 @@ const ImageManager = require('../../core/ImageManager');
 
 /**
  * @route GET /rest/posttype/{id}/categories
- * @group Articles
+ * @group Post Type
  * @param {integer} id.path
  * @returns {Array<Taxonomy>} 200
  * @returns {Error.model} 401
+ * @tag private
  * @security JWT
  */
 exports.getAll = async (data, req, res, next) => {
@@ -145,8 +146,6 @@ exports.update = async (data, req, res, next) => {
 exports.post = async (data, req, res, next) => {
 
   const postTypeID = Number(req.query.postTypeID);
-
-  console.log(req.query);
 
   if(!postTypeID || isNaN(postTypeID)) {
     return res.status(403).send(new ErrorModel("Campo postTypeID inválido"))

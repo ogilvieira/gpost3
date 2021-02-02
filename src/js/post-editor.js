@@ -18,7 +18,7 @@ if( document.querySelector("[data-vue=post-editor]") ) {
     },
     data: {
       editor: ClassicEditor,
-      editorData: `<figure class="image"><img src="https://content.betsul.com/media/istock-1245946530nmg.jpg" alt="Arsenal Manchester United"><figcaption>Arsenal e Manchester United se enfrentaram pela primeira vez em 1894 (iStock)</figcaption></figure><p>É difícil pensar em uma rivalidade tão grande e tão duradoura quanto a que os ingleses Manchester United e Arsenal mantém nos dias de hoje. Dois gigantes das cidades mais importantes do Reino Unido fazem confronto que sempre é muito aguardado no país e que balança com os sentimentos de milhões de torcedores. História riquíssima que tem alguns pontos curiosos.</p><p>Para começar, o Arsenal é o adversário que mais vezes o Manchester United enfrentou desde que foi criado, em uma rivalidade que começou ainda no século retrasado, em 1894 (o confronto inaugural terminou em 3 a 3). Outro ponto interessante é que, apesar de contabilizarem o mesmo número de jogos, Gunners e Red Devils somam retrospectos diferentes.</p><p>O grande ponto é que o Arsenal coloca mais vitórias para o Manchester United no retrospecto do que o próprio Red Devils contabiliza para si, algo que é quase único nas maiores rivalidades do mundo. Ficou curioso para saber os números do clássico? Então confira abaixo no levantamento que o Betsul preparou para hoje!</p><h2>Quantas vezes Arsenal x Manchester United aconteceu na história?</h2><p>É unânime na contagem de Manchester United e Arsenal o número de confrontos na história: 232. Destes, 202 foram pelo Campeonato Inglês (somando períodos pré e pós criação da Premier League), de acordo com as estatísticas oficiais do United. Quantos confrontos aconteceram por outras competições não foi possível encontrar, mas é sabido que o clássico já foi realizado por Liga dos Campeões, Copa da Inglaterra, Supercopa da Inglaterra, Copa da Liga Inglesa e Championship.</p><h2>Manchester United x Arsenal: quem leva vantagem no retrospecto?</h2><p>Os dois times concordam que quem leva vantagem em número de vitórias é o Manchester United. O engraçado é que os Red Devils contabilizam 97 triunfos sobre o Arsenal, enquanto o Arsenal soma 99 derrotas para o rival, um retrospecto para lá de esquisito pelo lado dos londrinos.</p><p>Com relação às vitórias do Arsenal, o clube conta 84 triunfos sobre o Manchester United, enquanto o time do Old Trafford tem em sua contagem 83 derrotas para o rival. Isso significa que os empates também não são contabilizados de maneira igual: 52 segundo os Red Devils e 49 de acordo com os Gunners.</p><h2>Quem venceu mais vezes pela Premier League?</h2><p>A partir da temporada 1992/93, começou na Inglaterra a Premier League. Desde então, Arsenal e Manchester United se enfrentaram 56 vezes e o retrospecto é muito favorável aos Diabos Vermelhos. São 24 vitórias, 17 empates e 15 triunfos dos Gunners. Neste período, 78 a 60 em favor do United no quesito número de gols marcados no clássico.</p>`,
+      editorData: "<div></div>",
       editorConfig: {
         contentsCss: '/css/style.css',
         alignment: {
@@ -39,7 +39,6 @@ if( document.querySelector("[data-vue=post-editor]") ) {
       showOptionsSEO: false,
       localSavedNotification: false,
       cachedTime: null,
-      isProcessingCats: true,
       isProcessing: true,
       isLoaded: false,
       rawData: null,
@@ -47,6 +46,10 @@ if( document.querySelector("[data-vue=post-editor]") ) {
       data: null,
       postType: null,
       categories: [],
+      isProcessingCats: true,
+      users: [],
+      isProcessingUsers: true,
+      errors: {}
     },
     props: {
       id: {
@@ -70,7 +73,7 @@ if( document.querySelector("[data-vue=post-editor]") ) {
           this.$http.get(`/rest/posttype/${this.postTypeID}`)
         ];
 
-        if( this.id == 'new' ) {
+        if( this.id == 'new' || isNaN(this.id) ) {
           this.data = {
             id: "new",
             title: "",
@@ -80,24 +83,35 @@ if( document.querySelector("[data-vue=post-editor]") ) {
             seoDescription: "",
             cover: "",
             content: "<div></div>",
-            status: false,
+            status: true,
             parent: this.postTypeID,
             category: "",
-            customFields: {},
-            publishedDate: new Date().toISOString(),
+            custom_fields: {},
+            published_date: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
             tags: []
           };
+        } else {
+          proms.push(this.$http.get(`/rest/article/${this.id}`));
         }
 
         Promise.all(proms)
           .then(res => {
-            this.postType = res[0].data;
 
-            if( this.postType.custom_fields ){
-              this.postType.custom_fields.map(a => {
-                this.data.customFields[a.key] = '';
-              });
+            if( res[1] ) {
+              this.data = res[1].data;
             }
+
+            if( res[0] ) {
+              this.postType = res[0].data;
+
+              if( this.postType.custom_fields ){
+                this.postType.custom_fields.map(a => {
+                  this.data.custom_fields[a.key] = this.data.custom_fields[a.key] || "";
+                });
+              }
+            }
+
           })
           .catch(err => {
             console.error(err);
@@ -109,6 +123,7 @@ if( document.querySelector("[data-vue=post-editor]") ) {
 
       },
       fetchCategories() {
+        this.isProcessingCats = true;
         this.$http.get(`/rest/posttype/${this.postTypeID}/categories`)
           .then(res => {
             this.categories = res.data || [];
@@ -118,6 +133,19 @@ if( document.querySelector("[data-vue=post-editor]") ) {
           })
           .then(() => {
             this.isProcessingCats = false;
+          })
+      },
+      fetchUsers() {
+        this.isProcessingUsers = true;
+        this.$http.get(`/rest/user?paginate=0`)
+          .then(res => {
+            this.users = res.data || [];
+          })
+          .catch(err => {
+            console.error(err);
+          })
+          .then(() => {
+            this.isProcessingUsers = false;
           })
       },
       checkTag(e) {
@@ -137,12 +165,12 @@ if( document.querySelector("[data-vue=post-editor]") ) {
         this.data.tags.splice(index,1)
       },
       checkCustomMultipleOption(customFieldKey, option){
-        let r = this.data.customFields[customFieldKey].split(',');
+        let r = (this.data.custom_fields[customFieldKey] || '').split(',');
         return r.indexOf(option) != -1;
       },
       toggleCustomMultipleOption( customFieldKey, option ){
 
-        let customFieldVal = this.data.customFields[customFieldKey].split(',').filter(a => !!a);
+        let customFieldVal = this.data.custom_fields[customFieldKey].split(',').filter(a => !!a);
         let index = customFieldVal.indexOf(option);
 
         if( index == -1 ) {
@@ -151,18 +179,18 @@ if( document.querySelector("[data-vue=post-editor]") ) {
           customFieldVal.splice(index, 1);
         }
 
-        let customFields = Object.assign({}, this.data.customFields);
-            customFields[customFieldKey] = customFieldVal.join(',');
+        let custom_fields = Object.assign({}, this.data.custom_fields);
+            custom_fields[customFieldKey] = customFieldVal.join(',');
 
-        Vue.set(vm.data, 'customFields', customFields);
+        Vue.set(vm.data, 'custom_fields', custom_fields);
 
       },
       setCustomInputImage(image, customFieldKey) {
 
-        let customFields = Object.assign({}, this.data.customFields);
-            customFields[customFieldKey] = image;
+        let custom_fields = Object.assign({}, this.data.custom_fields);
+            custom_fields[customFieldKey] = image;
 
-        Vue.set(vm.data, 'customFields', customFields);
+        Vue.set(vm.data, 'custom_fields', custom_fields);
       },
       openCategoryEditor( id = null ) {
         Modal.open('CATEGORY_EDITOR', { id: id, postTypeID: this.postTypeID })
@@ -179,6 +207,12 @@ if( document.querySelector("[data-vue=post-editor]") ) {
         try {
           cached = JSON.parse(cached);
           if( cached.data && cached.time ) {
+
+            if( new Date(this.rawData.updated_at).getTime() >= new Date(cached.time).getTime()) {
+              this.savedLocalDataAction('discard');
+              return;
+            }
+
             this.data = cached.data;
             this.cachedTime = cached.time;
             this.localSavedNotification = true;
@@ -191,7 +225,11 @@ if( document.querySelector("[data-vue=post-editor]") ) {
       checkToLocalSave() {
         if( JSON.stringify(this.data) != JSON.stringify(this.rawData) ){
           window.localStorage.setItem('post_'+this.data.id, JSON.stringify({time: new Date().toISOString(), data: this.data }));
-          this.$toast.info("Cópia de segurança salva.")
+          this.$toast.info("Cópia de segurança salva.");
+
+          if( !this.data.is_editing_by && this.data.id != 'new' ) {
+            this.$http.put(`/articles/${this.data.id}/lock`);
+          }
         }
       },
       savedLocalDataAction( action ) {
@@ -237,14 +275,68 @@ if( document.querySelector("[data-vue=post-editor]") ) {
         return val;
       },
       save( exit = true ) {
-        this.isProcessing = true;
+        this.errors = {};
 
-        this.savedLocalDataAction('discard');
-        this.fetchInfo();
-      }
+        if(!this.data.slug || this.data.slug.length < 3) {
+          this.errors['data.slug'] = 'Slug muito curto ou ausente.';
+        }
+
+        if(!this.data.title || this.data.title.length < 3) {
+          this.errors['data.title'] = 'Titulo muito curto ou ausente.';
+        }
+
+        if( !this.data.content.replace(/(<([^>]+)>)/gi, "") || this.data.content.replace(/(<([^>]+)>)/gi, "").length < 3 ) {
+          this.errors['data.content'] = 'Conteúdo ausente de texto.';
+        }
+
+        if( Object.keys(this.errors).length ){
+          this.$toast.error("Alguns campos precisam ser preenchidos corretamente.");
+          return;
+        }
+
+        this.isProcessing = true;
+        let path = `/rest/article${this.data.id == 'new' ? '' : '/'+this.data.id}`;
+
+        this.$http[this.data.id == 'new' ? 'post' : 'put'](path, this.data)
+          .then(res => {
+
+            this.$toast.success(res.message ? res.message : "Operação realizada com sucesso.");
+
+            this.savedLocalDataAction('discard');
+
+            if( this.data.id == 'new' && !exit) {
+              window.location = `/articles/${this.postTypeID}/${res.data.data.id}`;
+              return;
+            }
+
+            if( !exit ) {
+              this.fetchInfo();
+              return;
+            } else {
+              window.location = `/articles/${this.postTypeID}`;
+              return;
+            }
+
+
+          })
+          .catch(err => {
+            if( err.models ) {
+              Object.keys(err.models).map(a => {
+                this.errors[`data.${a}`] = err.models[a];
+              });
+            }
+
+            console.error(err);
+
+          })
+          .then(() => {
+            this.isProcessing = false;
+          })
+      },
     },
     created: function() {
       this.fetchCategories();
+      this.fetchUsers();
 
       let _self = this;
 
@@ -254,9 +346,21 @@ if( document.querySelector("[data-vue=post-editor]") ) {
 
       setInterval(() => {
         this.checkToLocalSave();
-      }, 3 * 60000)
+      }, 1 * 60000);
 
       this.fetchInfo();
+
+      window.addEventListener('beforeunload', function (e) {
+        if( _self.data && _self.rawData && (JSON.stringify(_self.rawData) != JSON.stringify(_self.data)) ) {
+          if( window.localStorage.getItem('post_'+_self.data.id) ) {
+            window.localStorage.removeItem('post_'+_self.data.id);
+          }
+          e.preventDefault();
+          e.returnValue = '';
+        }
+      });
+
+
     }
   });
 

@@ -8,7 +8,7 @@ const AuthModel = require('../../core/models/AuthModel');
  * @route GET /rest/user
  * @group User
  * @param {integer} page.query
- * @param {integer} paginate.query
+ * @param {integer} paginate.query - "0" to find all
  * @param {string} terms.query
  * @returns {Array<User>} 200
  * @returns {Error.model} 401
@@ -17,15 +17,18 @@ const AuthModel = require('../../core/models/AuthModel');
 exports.getAll = async (data, req, res, next) => {
 
   var page = req.query.page || 1;
-  var terms = req.query.terms || null; 
+  var terms = req.query.terms || null;
   var paginate = req.query.paginate || 10;
 
   if(page < 1){ page = 1; }
   var obj = {
-    page: page,
-    paginate: paginate,
     order: [['id', 'DESC']]
   };
+
+  if( Number(paginate) ) {
+    obj.paginate = Number(paginate);
+    obj.page = page;
+  }
 
   if(terms){
     obj.where = {};
@@ -40,16 +43,21 @@ exports.getAll = async (data, req, res, next) => {
   }
 
   try {
-    await UserSchema.paginate(obj)
+    await UserSchema[obj.paginate ? 'paginate' : 'findAll'](obj)
     .then(response => {
-      
-      if( response && response.docs ) {
+
+      if( obj.paginate && response.docs ) {
         response.docs = response.docs.map(a => new UserModel(a));
+      }
+
+      if(!obj.paginate) {
+        response = response.map( a => new UserModel(a));
       }
 
       res.send(response);
     });
   } catch ( err ) {
+    console.log(err);
     res.status(500).send(new ErrorModel());
   }
 

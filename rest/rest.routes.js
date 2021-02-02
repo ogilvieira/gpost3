@@ -26,8 +26,9 @@ const User = require("./controllers/User.Rest.Controller");
 const Config = require("./controllers/Config.Rest.Controller");
 const Media = require("./controllers/Media.Rest.Controller");
 const Banner = require("./controllers/Banner.Rest.Controller");
-const ArticlesArea = require("./controllers/ArticlesArea.Rest.Controller");
+const PostType = require("./controllers/PostType.Rest.Controller");
 const Category = require("./controllers/Category.Rest.Controller");
+const Article = require("./controllers/Article.Rest.Controller");
 
 
 module.exports = (app) => {
@@ -79,11 +80,14 @@ module.exports = (app) => {
     .post(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Banner.addItem)
 
   router.route("/posttype/:id")
-    .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, ArticlesArea.get)
-    .put(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, ArticlesArea.update)
+    .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, PostType.get)
+    .put(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, PostType.update)
 
   router.route("/posttype/:id/categories")
     .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Category.getAll)
+
+  router.route("/posttype/:id/articles")
+    .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Article.getAll)
 
   //Category
   router.route("/category")
@@ -93,13 +97,21 @@ module.exports = (app) => {
     .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Category.get)
     .put(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Category.update);
 
+  //Article
+  // router.route("/article")
+
+  router.route("/article/:id?")
+    .post(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Article.post)
+    .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Article.get)
+    .put(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Article.update)
+
 
   //PUBLIC
   router.route("/public/banner/:id")
     .get(Banner.getItemsPublic);
 
-  router.get("/public/posttype", ArticlesArea.listPublic);
-  router.get("/public/posttype/:slug", ArticlesArea.getPublic);
+  router.get("/public/posttype", PostType.listPublic);
+  router.get("/public/posttype/:slug", PostType.getPublic);
 
   return router;
 };

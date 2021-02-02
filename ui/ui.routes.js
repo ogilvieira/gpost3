@@ -38,8 +38,8 @@ module.exports = (app) => {
     router.get("/posttype/:posttypeID/edit", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Articles.editPosttype);
     router.get("/articles/:posttypeID/", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Articles.index);
     router.get("/articles/:posttypeID/categories", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Articles.categories);
-    router.get("/articles/:posttypeID/new", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Articles.postNew);
-    router.get("/articles/:posttypeID/:postID", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Articles.postEdit);
+    // router.get("/articles/:posttypeID/new", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Articles.postNew);
+    router.get("/articles/:posttypeID/:id", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Articles.postEdit);
   }
 
   router.get('/config', AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Config.index)

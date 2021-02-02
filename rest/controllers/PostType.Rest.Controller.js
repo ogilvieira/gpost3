@@ -7,7 +7,7 @@ const { PostTypeSchema, Sequelize } = require('../../core/schemas');
 
 /**
  * @route GET /rest/posttype/{id}
- * @group Articles
+ * @group Post Type
  * @param {integer} id.path
  * @returns {ArticleArea.model} 200
  * @returns {Error.model} 401
@@ -35,7 +35,7 @@ exports.get = async (data, req, res, next) => {
 
 /**
  * @route PUT /rest/posttype/{id}
- * @group Articles
+ * @group Post Type
  * @param {integer} id.path
  * @returns {Success.model} 200
  * @returns {Error.model} 401
@@ -80,7 +80,7 @@ exports.update = async (data, req, res, next) => {
 
 /**
  * @route GET /rest/public/posttype/
- * @group Articles Public
+ * @group Post Type Public
  * @returns {Array<ArticleArea>} 200
  * @returns {Error.model} 401
  */
@@ -104,7 +104,7 @@ exports.listPublic = async (req, res, next) => {
 
 /**
  * @route GET /rest/public/posttype/{slug}
- * @group Articles Public
+ * @group Post Type Public
  * @param {string} slug.path
  * @returns {ArticleArea.model} 200
  * @returns {Error.model} 401

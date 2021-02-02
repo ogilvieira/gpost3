@@ -1,6 +1,6 @@
 exports.index = async (data, req, res, next) => {
   data.SITE.title = "Posts";
-  return res.render('articles/articles', data);
+  return res.render('articles/post-list', data);
 }
 
 exports.editPosttype = async (data, req, res, next) => {
@@ -13,16 +13,9 @@ exports.categories = async (data, req, res, next) => {
   return res.render('articles/categories', data);
 }
 
-exports.postNew = async (data, req, res, next) => {
-  data.SITE.title = "Novo Post";
-  data.posttype = req.params.posttypeID;
-  data.ID = "new";
-  return res.render('articles/post', data);
-}
-
 exports.postEdit = async (data, req, res, next) => {
-  data.SITE.title = "Editar Post";
   data.posttype = req.params.posttypeID;
-  data.ID = "new";
-  return res.render('articles/post', data);
+  data.ID = req.params.id;
+  data.SITE.title = data.ID == 'new' ? "Novo Post" : "Editar Post";
+  return res.render('articles/post-editor', data);
 }
