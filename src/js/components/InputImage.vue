@@ -39,6 +39,10 @@
         type: Boolean,
         default: true
       },
+      removefromserver: {
+        type: Boolean,
+        default: true
+      },
       invalid: {
         type: Boolean,
         default: false
@@ -87,15 +91,15 @@
       },
       removeFile: function() {
 
-        if(typeof this.value == 'object') {
+        if(typeof this.value == 'object' || !this.removefromserver) {
           this.imageBase64 = null;
           this.updateValue("");
           return;
         }
 
         var confirm = window.confirm("Tem certeza que deseja excluir este arquivo permanentemente?");
-
         if(!confirm){ return; }
+
 
         var file = this.value;
 

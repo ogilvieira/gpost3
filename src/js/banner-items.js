@@ -182,8 +182,6 @@ if( document.querySelector("[data-vue=banner-items]") ) {
           return this.insertNewItems(items);
         }
 
-        console.log("Upload images: ", imageToUpload);
-
         let proms = [];
         let _self = this;
 

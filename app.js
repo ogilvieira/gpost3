@@ -43,7 +43,7 @@ app.use(fileUpload({
 }));
 
 
-var BASE_URL = "";
+var BASE_URL = process.env.BASE_URL || "";
 
 //set common middleware
 app.use((req, res, next) => {
@@ -57,25 +57,25 @@ app.use((req, res, next) => {
     req.url.endsWith('.gif')){
 
     res.set({ 'Cache-Control':'public, max-age=31536000' });
+  };
 
-};
-
-  BASE_URL = process.env.BASE_URL || (req.protocol + '://' + req.hostname  + ((process.env.NODE_ENV == "production" || port == 80 || port == 443) ? '' : ':' + port));
-  res.locals.BASE_URL = BASE_URL
-
+  BASE_URL = BASE_URL || (req.protocol + '://' + req.hostname  + ((process.env.NODE_ENV == "production" || port == 80 || port == 443) ? '' : ':' + port));
+  res.locals.BASE_URL = BASE_URL;
   next();
 });
 
 const routes = require(path.join(__dirname, `${ isInstall ? 'install/install' : 'ui/ui'}.routes.js`))(app);
 app.use('/', routes);
 const routesRest = require(path.join(__dirname, 'rest/rest.routes.js'))(app);
-app.use('/rest/public/', cors({
+app.use('/rest', routesRest);
+
+const routesApi = require(path.join(__dirname, 'api/api.routes.js'))(app);
+app.use('/api', cors({
     credentials: true,
     origin: (origin, cb) => {  return cb(null, true); }
   }));
 
-app.use('/rest', routesRest);
-
+app.use('/api', routesApi);
 
 //set swagger
 const expressSwagger =  require('express-swagger-generator')(app);
@@ -86,14 +86,14 @@ let optionsSwagger = {
       title: pjson.name,
       version: pjson.version,
     },
-    host: `${BASE_URL}`,
-    basePath: '/',
+    host: `${BASE_URL.split("://").slice(1).join('')}`,
+    basePath: BASE_URL ? '' : '/',
     produces: [
     "application/json",
     "application/xml",
     "multipart/form-data"
     ],
-    schemes: ['http', 'https'],
+    schemes: [`${BASE_URL.split("://")[0]}`],
     securityDefinitions: {
       JWT: {
         type: 'apiKey',
@@ -104,8 +104,12 @@ let optionsSwagger = {
     }
   },
   basedir: __dirname, //app absolute path
-  files: ['./rest/**/*.js', './core/models/**/*.js'] //Path to the API handle folder
+  files: ['./api/**/*.js', './core/models/**/*.js']
 };
+
+if( process.env.NODE_ENV == 'development' ) {
+  optionsSwagger.files.push('./rest/**/*.js');
+}
 
 expressSwagger(optionsSwagger);
 

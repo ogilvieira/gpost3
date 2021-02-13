@@ -6,7 +6,14 @@
       <div class="columns has-text-right">
         <div class="column">
 
-          <a href="/articles/1/new" class="button is-warning">
+          <div class="select">
+            <select>
+              <option>Todos os Artigos</option>
+              <option>Somente os meus</option>
+            </select>
+          </div>
+
+          <a :href="'/articles/'+postTypeID+'/new'" class="button is-warning">
             <span class="icon">
               <i class="fas fa-plus-square"></i>
             </span>
@@ -31,13 +38,13 @@
         </div>
       </div>
 
-      <div class="columns" v-if="!data && !isProcessing">
+      <div class="columns" v-if="(!data || !data.docs) && !isProcessing">
         <div class="column">
           <div class="notification">
 
             <div class="mb-2"><i class="fas fa-exclamation-circle mr-1"></i> Nenhum item encontrado.</div>
 
-            <button class="button is-rounded is-small">
+            <button class="button is-rounded is-small" v-on:click="fetchInfo()">
               <span class="icon">
                 <i class="fas fa-sync-alt"></i>
               </span>
@@ -59,9 +66,18 @@
         </div>
       </div>
 
+      <nav class="pagination mt-5" role="navigation" aria-label="pagination" v-if="data && data.docs">
+        <button class="button pagination-previous" v-on:click="fetchInfo(page-1)" :disabled="page <= 1" v-bind:class="{'is-loading' : isProcessing }"><i class="fas fa-arrow-left mr-1"></i>Anterior</button>
 
-      <div class="box" v-for="item in data" v-if="data && !isProcessing">
-        <article>
+        <ul class="pagination-list">
+          <li><span>Página <strong>{{page}}</strong> de <strong>{{data && data.pages ? data.pages : '1'}}</strong></span></li>
+        </ul>
+
+        <button class="button pagination-next" v-on:click="fetchInfo(page+1)" :disabled="page >= data.pages" v-bind:class="{'is-loading' : isProcessing }">Próxima <i class="fas fa-arrow-right ml-1"></i></button>
+      </nav>
+
+      <div v-if="data && data.docs">
+        <article class="box" v-for="item in data.docs">
           <div class="content">
             <div v-if="!item.status">
              <span class="tag is-danger">Rascunho</span>
@@ -78,13 +94,13 @@
                 {{item.description}}
               </div>
               <div class="has-text-grey-light is-size-7">
-                <i class="fas fa-clock mr-1"></i> <span>Criado em {{item.created_at | moment("DD/MM/YY \à\\s HH:mm")}}</span> - <span><i class="fas fa-user mr-1"></i><span>{{getUserPropByID(item.author, 'name')}}</span></span>
+                <i class="fas fa-clock mr-1"></i> <span>Criado em {{item.created_at | moment("DD/MM/YY \à\\s HH:mm")}}</span> - <span><i class="fas fa-user mr-1"></i><span>{{item.author.name}}</span></span>
               </div>
               <hr>
 
           </div>
           <div>
-            <a :href="'/articles/1/'+item.id" class="button is-rounded" v-bind:class="{'is-info' : !item.is_editing_by, 'is-danger' : item.is_editing_by}">
+            <a :href="'/articles/1/'+item.id" class="button is-rounded" v-bind:class="{'is-info' : !item.is_editing_by, 'is-danger' : item.is_editing_by, 'is-loading' : isProcessing}">
               <i class="fas fa-edit mr-2" v-bind:class="{'fa-edit' : !item.is_editing_by, 'fa-lock-open' : item.is_editing_by}"></i> Editar item
             </a>
           </div>
@@ -92,12 +108,6 @@
 
         </article>
       </div>
-
-
-      <nav class="pagination" role="navigation" aria-label="pagination">
-        <a href="javascript:void(0);" class="pagination-previous"><i class="fas fa-arrow-left mr-1"></i>Anterior</a>
-        <a href="javascript:void(0);" class="pagination-next">Próxima <i class="fas fa-arrow-right ml-1"></i></a>
-      </nav>
 
     </div>
   </div>

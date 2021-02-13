@@ -1,5 +1,11 @@
 const slugify = require('slugify');
+const cheerio = require('cheerio');
+const { extract } = require('oembed-parser');
 const ErrorModel = require('./ErrorModel.js');
+const TaxonomyModel = require('../../core/models/TaxonomyModel');
+const UserModel = require('../../core/models/UserModel');
+const { AssociationSchema, TaxonomySchema, UserSchema } = require('../../core/schemas');
+
 /**
  * @typedef Article
  * @property {integer} id
@@ -12,8 +18,8 @@ const ErrorModel = require('./ErrorModel.js');
  * @property {string} content
  * @property {boolean} status
  * @property {integer} parent - Post Type ID
- * @property {integer} category
- * @property {integer} author
+ * @property {Taxonomy.model} category
+ * @property {User.model} author
  * @property {Array<string>} tags
  * @property {object} custom_fields
  * @property {string} slug_key
@@ -22,43 +28,114 @@ const ErrorModel = require('./ErrorModel.js');
  */
 
 function Article(data) {
-  this.id = data.id || "";
-  this.title = data.title || "";
-  this.description = data.description || "";
+  this.id = data.id;
+  this.title = data.title;
+  this.description = data.description;
   this.slug = data.slug ? data.slug : (data.title ? slugify(data.title, { replacement: '-', lower: true, remove: /[*+~.()'"!:@]/g }).toLowerCase() : "");
-  this.seo_title = data.seo_title || "";
-  this.seo_description = data.seo_description  || "";
   this.cover = data.cover || "";
   this.content = data.content || "<div></div>";
   this.parent = data.parent || "";
   this.category = data.category || "";
   this.author = data.author || "";
-  this.tags = Array.isArray(data.tags) ? (data.tags || []) : (data.tags || '').split(',').filter(a => !!a).map(a => a.trim());
+  this.tags = data.tags || [];
   this.status = !!data.status;
-  this.custom_fields = typeof data.custom_fields == 'object' ? data.custom_fields : JSON.parse(data.custom_fields);
-  this.slug_key = `${this.slug||""}${this.category||""}${this.parent||""}`.toLowerCase();
-  this.lang = data.lang || "pt-br";
+  this.custom_fields = null;
+  this.slug_key = data.slug_key;
+  this.lang = data.lang;
   this.published_date = data.published_date || new Date().toISOString();
-  this.updated_at = data.updatedAt || "";
-  this.created_at = data.createdAt || "";
+  this.updated_at = data.updatedAt  || new Date().toISOString();
+  this.created_at = data.createdAt  || new Date().toISOString();
   this.is_editing_by = data.is_editing_by || "";
 
-  if(!this.parent) {
-    throw new ErrorModel("Article inválido.", { "parent" : "Parent é requerido." });
+  if(!this.description) {
+    this.description = this.content.replace(/(<([^>]+)>)/gi, "");
+    if( this.description.length > 120 ) {
+      this.description = this.description.slice(0, 117).trim()+"...";
+    }
   }
 
-  if(!this.author) {
-    throw new ErrorModel("Article inválido.", { "author" : "Author é requerido." });
-  }
+  this.seo_title = data.seo_title || this.title;
+  this.seo_description = data.seo_description || this.description;
 
-  if(!this.title) {
-    throw new ErrorModel("Article inválido.", { "title" : "Titulo é requerido." });
-  }
+  this.Populate = async () => {
 
-  if(!this.content.replace(/(<([^>]+)>)/gi, "") || this.content.replace(/(<([^>]+)>)/gi, "").length < 3 ) {
-    throw new ErrorModel("Article inválido.", { "content" : "Conteúdo é requerido." });
-  }
+    let tags = await AssociationSchema.findAll({
+      where: { type: 'TAG', target: this.id },
+      attributes: ['value']
+    });
 
+    this.tags = [];
+    tags.map(tag => this.tags.push(tag.value));
+
+    let custom_fields = await AssociationSchema.findAll({
+      where: { type: 'ARTICLE_CUSTOM_FIELD', target: this.id },
+      attributes: ['key','value']
+    });
+
+    this.custom_fields = {};
+    custom_fields.map(cf => {
+      this.custom_fields[cf.key] = cf.value;
+    });
+
+    if( this.category ) {
+
+      let category = await TaxonomySchema.findOne({ where: {
+        id: this.category,
+        system: "ARTICLE",
+        type: "CATEGORY",
+      }});
+
+      this.category = new TaxonomyModel(category);
+    }
+
+    if ( this.author ) {
+      let author = await UserSchema.findOne({ where: {
+        id: this.author
+      }});
+
+      this.author = new UserModel(author);
+    }
+
+
+
+    //content improoves
+    const $html = cheerio.load(this.content);
+
+    var oembedProms = [];
+
+    $html('figure.media').each(function(a, b){
+      $html(b).replaceWith(`<div class="media">${$html(b).html()}</div>`);
+    });
+
+    $html('oembed').each(function(a, b){
+
+      let href = ($html(b).attr('url') || "").replace("http://", "https://");
+      if( href.indexOf("youtu.be") >= 0 ){
+        href = href.split("youtu.be/")[1];
+        href = "https://www.youtube.com/watch?v=" + href;
+      }
+
+      $html(b).attr("href", href);
+
+      oembedProms.push(new Promise(function(resolve, reject) {
+        extract(href).then((oembed) => {
+          $html(b).replaceWith(oembed.html);
+          resolve(true);
+        }).catch((err) => {
+          $html(b).replaceWith(`<a href="${href}" target="_blank">${href}</a>`);
+          reject();
+        });
+      }));
+
+    });
+
+    await Promise.all(oembedProms);
+    this.content = $html('body').html();
+
+
+    return this;
+
+  };
 }
 
 module.exports = Article;

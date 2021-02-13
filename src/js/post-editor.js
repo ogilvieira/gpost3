@@ -48,6 +48,7 @@ if( document.querySelector("[data-vue=post-editor]") ) {
       categories: [],
       isProcessingCats: true,
       users: [],
+      myUser: null,
       isProcessingUsers: true,
       errors: {}
     },
@@ -213,6 +214,9 @@ if( document.querySelector("[data-vue=post-editor]") ) {
               return;
             }
 
+
+            if( typeof cached.data.cover == 'object' ) { cached.data.cover = ""; }
+
             this.data = cached.data;
             this.cachedTime = cached.time;
             this.localSavedNotification = true;
@@ -223,14 +227,56 @@ if( document.querySelector("[data-vue=post-editor]") ) {
 
       },
       checkToLocalSave() {
-        if( JSON.stringify(this.data) != JSON.stringify(this.rawData) ){
+
+        let rawData = JSON.stringify(this.rawData);
+
+        if( window.localStorage.getItem('post_'+this.data.id) ){
+          rawData = JSON.stringify(JSON.parse(window.localStorage.getItem('post_'+this.data.id)).data);
+        }
+
+        if( JSON.stringify(this.data) != rawData ){
           window.localStorage.setItem('post_'+this.data.id, JSON.stringify({time: new Date().toISOString(), data: this.data }));
           this.$toast.info("Cópia de segurança salva.");
 
           if( !this.data.is_editing_by && this.data.id != 'new' ) {
-            this.$http.put(`/articles/${this.data.id}/lock`);
+            this.$http.put(`/rest/article/${this.data.id}/lock`)
+              .then(res => {
+                this.data.is_editing_by = res.data.id;
+              });
           }
         }
+      },
+      cancel() {
+        if(this.data.id != 'new' && this.data.is_editing_by && this.data.is_editing_by == this.myUser.id){
+          this.unlockItem(() => {
+            window.location = `/articles/${this.postTypeID}`;
+          });
+        } else {
+          window.location = `/articles/${this.postTypeID}`;
+        }
+
+
+      },
+      unlockItem(cb, confirmMsg = false){
+
+        if(confirmMsg){
+          let confirm = window.confirm("Tem certeza que deseja desbloquear este artigo para edição?");
+          if(!confirm){ return; }
+        }
+
+        if(this.data.id == 'new'){
+          if( typeof cb == 'function' ){ return cb(); }
+          return;
+        }
+
+        this.$http.put(`/rest/article/${this.data.id}/unlock`)
+          .then(res => {
+            if( typeof cb == 'function' ){
+              cb();
+            }
+            this.fetchInfo();
+          });
+
       },
       savedLocalDataAction( action ) {
         if( action == 'keep' ) {
@@ -240,6 +286,7 @@ if( document.querySelector("[data-vue=post-editor]") ) {
           this.localSavedNotification = false;
           this.data = JSON.parse(JSON.stringify(this.rawData));
           this.cachedTime = null;
+          this.unlockItem();
 
           if( window.localStorage.getItem('post_'+this.data.id) ) {
             window.localStorage.removeItem('post_'+this.data.id);
@@ -274,6 +321,42 @@ if( document.querySelector("[data-vue=post-editor]") ) {
 
         return val;
       },
+      processPost(data, exit){
+        this.isProcessing = true;
+         let path = `/rest/article${this.data.id == 'new' ? '' : '/'+this.data.id}`;
+         return this.$http[data.id == 'new' ? 'post' : 'put'](path, data)
+          .then(res => {
+
+            this.$toast.success(res.message ? res.message : "Operação realizada com sucesso.");
+
+            this.savedLocalDataAction('discard');
+
+            if( data.id == 'new' && !exit) {
+              window.location = `/articles/${this.postTypeID}/${res.data.data.id}`;
+              return;
+            }
+
+            if( !exit ) {
+              this.fetchInfo();
+              return;
+            } else {
+              window.location = `/articles/${this.postTypeID}`;
+              return;
+            }
+
+          })
+          .catch(err => {
+            if( err.models ) {
+              Object.keys(err.models).map(a => {
+                this.errors[`data.${a}`] = err.models[a];
+              });
+            }
+            console.error(err);
+          })
+          .then(() => {
+            this.isProcessing = false;
+          })
+      },
       save( exit = true ) {
         this.errors = {};
 
@@ -294,44 +377,27 @@ if( document.querySelector("[data-vue=post-editor]") ) {
           return;
         }
 
-        this.isProcessing = true;
-        let path = `/rest/article${this.data.id == 'new' ? '' : '/'+this.data.id}`;
 
-        this.$http[this.data.id == 'new' ? 'post' : 'put'](path, this.data)
-          .then(res => {
+        let proms = [];
 
-            this.$toast.success(res.message ? res.message : "Operação realizada com sucesso.");
+        let _self = this;
+        // upload image or not?
+        if( _self.data.cover && typeof _self.data.cover != 'string' ) {
+          this.isProcessing = true;
+          this.$uploadImage(_self.data.cover)
+            .then( urlImage => {
+              _self.data.cover = urlImage;
+              _self.processPost(_self.data, exit)
+            })
+            .catch(err => {
+              this.isProcessing = false;
+              console.error(err);
+              this.$toast.error("Erro ao fazer upload da Imagem de Capa");
+            });
+        } else {
+          _self.processPost(_self.data, exit);
+        }
 
-            this.savedLocalDataAction('discard');
-
-            if( this.data.id == 'new' && !exit) {
-              window.location = `/articles/${this.postTypeID}/${res.data.data.id}`;
-              return;
-            }
-
-            if( !exit ) {
-              this.fetchInfo();
-              return;
-            } else {
-              window.location = `/articles/${this.postTypeID}`;
-              return;
-            }
-
-
-          })
-          .catch(err => {
-            if( err.models ) {
-              Object.keys(err.models).map(a => {
-                this.errors[`data.${a}`] = err.models[a];
-              });
-            }
-
-            console.error(err);
-
-          })
-          .then(() => {
-            this.isProcessing = false;
-          })
       },
     },
     created: function() {
@@ -339,6 +405,11 @@ if( document.querySelector("[data-vue=post-editor]") ) {
       this.fetchUsers();
 
       let _self = this;
+
+      this.$http.get("/rest/account")
+        .then( res => {
+          _self.myUser = res.data || null;
+        })
 
       window.addEventListener("category:update", function (e) {
         _self.fetchCategories();
@@ -352,9 +423,6 @@ if( document.querySelector("[data-vue=post-editor]") ) {
 
       window.addEventListener('beforeunload', function (e) {
         if( _self.data && _self.rawData && (JSON.stringify(_self.rawData) != JSON.stringify(_self.data)) ) {
-          if( window.localStorage.getItem('post_'+_self.data.id) ) {
-            window.localStorage.removeItem('post_'+_self.data.id);
-          }
           e.preventDefault();
           e.returnValue = '';
         }

@@ -36,24 +36,24 @@
           <div class="column is-9">
 
             <div class="mb-3">
-              <button class="button is-small" v-bind:class="{'is-loading' : isProcessing }"><i class="fa fa-arrow-left mr-1"></i> Cancelar</button>
+              <button class="button is-small" v-on:click="cancel()" v-bind:class="{'is-loading' : isProcessing }"><i class="fa fa-arrow-left mr-1"></i> Sair</button>
               <button class="button is-small is-success" v-bind:class="{'is-loading' : isProcessing }" v-on:click="save(true)" :disabled="JSON.stringify(rawData) == JSON.stringify(data)"><i class="fa fa-save mr-1"></i> Salvar e sair</button>
               <button class="button is-small is-info" v-bind:class="{'is-loading' : isProcessing }" v-on:click="save(false)" :disabled="JSON.stringify(rawData) == JSON.stringify(data)"><i class="fa fa-pen-square mr-1"></i> Salvar e continuar editando</button>
             </div>
 
 
-            <div v-if="data.is_editing_by" class="notification is-danger is-light">
+            <div v-if="myUser && data.is_editing_by && data.is_editing_by != myUser.id" class="notification is-danger is-light">
               <div class="mb-2">
                 <div class="subtitle"><i class="fa fa-exclamation-circle"></i> Este artigo esta sendo editado por outra pessoa.</div>
                 <p>
-                  Parece que <strong>Fulano Sicrano</strong> esta editando este artigo neste momento. Por questão de segurança, <strong>modificações não serão salvas.</strong><br><br>
+                  Parece que <strong v-text="users.find(a => a.id == data.is_editing_by).name || 'alguém'"></strong> esta editando este artigo neste momento. Por questão de segurança, <strong>modificações não serão salvas.</strong><br><br>
                 </p>
               </div>
-              <button class="button is-danger"><i class="fa fa-check mr-2"></i> Desbloquear Edição</button>
+              <button class="button is-danger" v-on:click="unlockItem(null, true)"><i class="fa fa-check mr-2"></i> Desbloquear Edição</button>
             </div>
 
 
-            <div v-if="localSavedNotification && !data.is_editing_by" class="notification is-info is-light">
+            <div v-if="localSavedNotification && data.is_editing_by && data.is_editing_by == myUser.id" class="notification is-info is-light">
               <div class="mb-2">
                 <div class="subtitle"><i class="fa fa-exclamation-circle"></i> Você esta editando uma cópia de segurança</div>
                 <p>
@@ -83,6 +83,8 @@
                   <a href="javascript:void(0);" v-on:click="editSlug = false" class="is-size-7"><i class="fas fa-edit ml-1"></i> Terminar edição</a>
                 </div>
               </div>
+
+              <div class="is-size-7 mb-2 has-text-danger" v-if="!!Object.keys(errors).find(a => a == 'data.slug' || a == 'data.slug_key')">Slug inválido ou duplicado. Tente editar o slug ou a categoria do artigo.</div>
 
               <div class="field">
                 <div class="control has-icons-left">
@@ -186,7 +188,7 @@
 
                   <div class="field mb-5" v-if="custom_field.type == 'IMAGE'">
                     <label class="label"><span v-text="custom_field.title"></span><span class="has-text-danger" v-if="custom_field.required"> *</span></label>
-                    <input-image v-model="data.custom_fields[custom_field.key]" :candelete="false" v-on:change="(image) => setCustomInputImage(image, custom_field.key)" :disabled="isProcessing" />
+                    <input-image v-model="data.custom_fields[custom_field.key]" :candelete="false" :removefromserver="false" v-on:change="(image) => setCustomInputImage(image, custom_field.key)" :disabled="isProcessing" />
                   </div>
 
                 </div>
@@ -215,7 +217,7 @@
 
             <div class="mb-3">
               <span class="label">Imagem de Capa:</span>
-              <input-image :placeholder="'Imagem de capa'" v-model="data.cover" :disabled="isProcessing"></input-image>
+              <input-image :placeholder="'Imagem de capa'" v-model="data.cover" :removefromserver="false" :disabled="isProcessing"></input-image>
             </div>
             <hr>
 

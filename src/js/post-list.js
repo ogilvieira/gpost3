@@ -8,6 +8,7 @@ if( document.querySelector("[data-vue=post-list]") ) {
       isProcessing: false,
       data: null,
       users: [],
+      page: 1,
       isProcessingUsers: true,
     },
     props: {
@@ -22,15 +23,23 @@ if( document.querySelector("[data-vue=post-list]") ) {
       fetchInfo: function(page = 1){
         this.isProcessing = true;
 
-        this.$http.get(`/rest/posttype/${this.postTypeID}/articles`)
+        if( page < 1 ) { page = 1; }
+
+        if( this.data && this.data.pages && page > this.data.pages ) {
+          page = this.data.pages;
+        }
+
+
+        this.$http.get(`/rest/articles/posttype/${this.postTypeID}?page=${page}`)
           .then(res => {
-            this.data = res.data;
+            this.data = res.data ? res.data : null;
           })
           .catch(res => {
             console.error(res);
           })
           .then(res => {
             this.isProcessing = false;
+            this.page = page;
           })
       },
       isFuture(dateISO) {

@@ -96,7 +96,7 @@ function watch() {
     execMap: {
       js: "node",
     },
-    watch: ["app.js","AuthGuard.js", "core/**/*", "install/**/*", "rest/**/*", "ui/**/*"],
+    watch: ["app.js","AuthGuard.js", "core/**/*", "install/**/*", "rest/**/*", "ui/**/*", "api/**/*"],
     events: {
       start: "echo 'Server started'",
       restart: "echo 'Server started'",

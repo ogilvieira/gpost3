@@ -29,6 +29,7 @@ const Banner = require("./controllers/Banner.Rest.Controller");
 const PostType = require("./controllers/PostType.Rest.Controller");
 const Category = require("./controllers/Category.Rest.Controller");
 const Article = require("./controllers/Article.Rest.Controller");
+const Tags = require("./controllers/Tags.Rest.Controller");
 
 
 module.exports = (app) => {
@@ -86,8 +87,6 @@ module.exports = (app) => {
   router.route("/posttype/:id/categories")
     .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Category.getAll)
 
-  router.route("/posttype/:id/articles")
-    .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Article.getAll)
 
   //Category
   router.route("/category")
@@ -98,7 +97,8 @@ module.exports = (app) => {
     .put(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Category.update);
 
   //Article
-  // router.route("/article")
+  router.route("/articles/posttype/:id")
+    .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Article.getAll)
 
   router.route("/article/:id?")
     .post(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Article.post)
@@ -106,12 +106,12 @@ module.exports = (app) => {
     .put(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Article.update)
 
 
-  //PUBLIC
-  router.route("/public/banner/:id")
-    .get(Banner.getItemsPublic);
+  router.put("/article/:id/lock", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Article.lock)
+  router.put("/article/:id/unlock", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Article.unlock)
 
-  router.get("/public/posttype", PostType.listPublic);
-  router.get("/public/posttype/:slug", PostType.getPublic);
+  //Article
+  router.route("/tags")
+    .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Tags.getAll)
 
   return router;
 };

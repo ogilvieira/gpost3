@@ -46,12 +46,6 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       unique: true
     },
-    tags: {
-      type: DataTypes.TEXT
-    },
-    custom_fields: {
-      type: DataTypes.TEXT
-    },
     published_date: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -64,11 +58,6 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING,
       defaultValue: 'pt-br'
     }
-  });
-
-  Article.addHook('beforeValidate', async (article, options) => {
-    article.custom_fields = JSON.stringify(article.custom_fields);
-    article.tags = article.tags.join(",");
   });
 
   Article.sync();
