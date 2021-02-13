@@ -42,9 +42,9 @@ function Article(data) {
   this.custom_fields = null;
   this.slug_key = data.slug_key;
   this.lang = data.lang;
-  this.published_date = data.published_date || new Date().toISOString();
-  this.updated_at = data.updatedAt  || new Date().toISOString();
-  this.created_at = data.createdAt  || new Date().toISOString();
+  this.published_date = new Date(data.published_date || '').toISOString();
+  this.updated_at = data.updatedAt || new Date().toISOString();
+  this.created_at = data.createdAt || new Date().toISOString();
   this.is_editing_by = data.is_editing_by || "";
 
   if(!this.description) {

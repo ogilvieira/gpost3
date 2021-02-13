@@ -108,7 +108,6 @@ exports.getAll = async (req, res, next) => {
       }
     });
 
-
     if( Object.values(customFieldObj) ) {
       let arrCFPosts = [];
 
@@ -156,6 +155,7 @@ exports.getAll = async (req, res, next) => {
 
     res.send(response);
   } catch (err) {
+    console.log(err);
     return next();
   }
 }
