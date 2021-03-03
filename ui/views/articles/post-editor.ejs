@@ -114,7 +114,7 @@
 
                 <div class="field" v-if="showOptionsSEO">
                   <div class="control is-small has-icons-left">
-                    <input class="input is-small" type="text" minlength="6" placeholder="SEO Headline" :disabled="isProcessing">
+                    <input class="input is-small" maxlength="120" v-model="data.seo_title" type="text" minlength="6" placeholder="SEO Headline" :disabled="isProcessing">
                     <span class="icon is-small is-left">
                       <i class="fas fa-heading"></i>
                     </span>
@@ -123,10 +123,10 @@
 
                 <div class="field" v-if="showOptionsSEO">
                   <div class="control is-small">
-                    <textarea class="textarea is-small has-fixed-size" rows="2" placeholder="SEO Meta Description" maxlength="120" v-model="data.seoDescription" :disabled="isProcessing"></textarea>
+                    <textarea class="textarea is-small has-fixed-size" rows="2" placeholder="SEO Meta Description" maxlength="120" v-model="data.seo_description" :disabled="isProcessing"></textarea>
                   </div>
                   <small class="is-size-7 has-text-grey">
-                    <i class="fa fa-keyboard mr-1"></i> <span><span v-text="data.seoDescription.length"></span>/120 caracteres.</span>
+                    <i class="fa fa-keyboard mr-1"></i> <span><span v-text="data.seo_description.length"></span>/120 caracteres.</span>
                   </small>
                 </div>
               </div>
@@ -213,7 +213,6 @@
             <div class="mb-3">
               <button class="button is-small is-rounded" v-on:click="showOptionsSEO = !showOptionsSEO" :disabled="isProcessing"><i class="fa mr-2" v-bind:class="{'fa-eye-slash': !showOptionsSEO, 'fa-eye': showOptionsSEO}"></i> Opções de SEO</button>
             </div>
-
 
             <div class="mb-3">
               <span class="label">Imagem de Capa:</span>

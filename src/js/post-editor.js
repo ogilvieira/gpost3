@@ -154,7 +154,7 @@ if( document.querySelector("[data-vue=post-editor]") ) {
 
         if(e.keyCode == 188 || e.keyCode == 13 ) {
 
-          if(e.target.value.length < 3 || this.data.tags.indexOf(e.target.value)!=-1){ return; }
+          if(e.target.value && e.target.value.length < 3 || this.data.tags.indexOf(e.target.value)!=-1){ return; }
 
           this.data.tags.push(e.target.value);
           e.target.value = "";
