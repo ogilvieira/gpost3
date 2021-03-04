@@ -29,8 +29,6 @@ exports.index = async (data, req, res, next) => {
     ]
   };
 
-  data.user = null;
-
   let configs = await ConfigSchema.findAll({'atributes' : ['key_value','key_slug']});
   let articlesAreas = await PostTypeSchema.findAll({ where: {'system' : 'ARTICLE'}, 'atributes' : ['title','id']});
   data.SITE.articlesAreas = articlesAreas;

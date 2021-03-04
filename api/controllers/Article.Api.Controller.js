@@ -210,3 +210,66 @@ exports.get = async (req, res, next) => {
     return res.status(404).send(new ErrorModel(err ? err : "Post não encontrado."));
   }
 }
+
+
+
+/**
+ * @route GET /api/posttype/{posttypeID}/featured
+ * @group Post Type
+ * @param {integer} posttypeID.path
+ * @returns {Array<Article>} 200
+ */
+exports.getFeatured = async (req, res, next) => {
+
+  const posttypeID = req.params.posttypeID;
+
+  console.log(posttypeID);
+
+  if(!posttypeID) { return res.status(403).send(new ErrorModel()) }
+
+  var idList = [];
+
+  await AssociationSchema.findAll({ 
+    attributes: ["value"],
+    where: {
+      type: "ARTICLE_FEATURED",
+      target: posttypeID,
+    },
+  }).then((items) => {
+    idList = items.map(a => a.value);
+  });
+
+
+  if(!idList.length){ return res.send([]); }
+
+
+  try {
+
+    var response = await ArticleSchema.findAll({
+      where: {
+        id: {
+          [Sequelize.Op.in] : idList
+        },
+        parent: posttypeID
+      }
+    });
+
+    response = await Promise.all(response.map(async (a) => {
+      a = new ArticleModel(a).Populate();
+      return a;
+    }));
+
+    return res.send(response);
+
+  } catch( err ) {
+
+    let models = {}
+    if(err.errors) {
+      err.errors.map(a => {
+        models[a.path] = a.message;
+      });
+    }
+
+    return res.status(403).send(err instanceof ErrorModel ? err : new ErrorModel(err && err.message ? err.message : "Erro ao tentar buscar itens.", models));
+  }
+}

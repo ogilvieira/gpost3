@@ -87,6 +87,10 @@ module.exports = (app) => {
   router.route("/posttype/:id/categories")
     .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Category.getAll)
 
+  router.route("/posttype/:id/featured")
+    .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Article.getFeatured)
+    .put(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Article.updateFeatured);
+
 
   //Category
   router.route("/category")

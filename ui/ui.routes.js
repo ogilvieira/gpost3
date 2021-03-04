@@ -33,10 +33,10 @@ module.exports = (app) => {
   router.get('/banners/:id', AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Banners.edit);
   router.get('/banners/:id/items', AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Banners.detail);
 
-
   router.get("/posttype/:posttypeID/edit", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Articles.editPosttype);
   router.get("/articles/:posttypeID/", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Articles.index);
   router.get("/articles/:posttypeID/categories", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Articles.categories);
+  router.get("/articles/:posttypeID/featured", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Articles.featured);
   router.get("/articles/:posttypeID/:id", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Articles.postEdit);
 
   router.get('/config', AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Base.index, Config.index)

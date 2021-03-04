@@ -40,6 +40,7 @@ module.exports = (app) => {
 
   router.get("/articles", Article.getAll);
   router.get("/article/:articleID", Article.get);
+  router.get("/posttype/:posttypeID/featured", Article.getFeatured);
 
   router.get("/categories/:posttypeID", Category.getAll);
   router.get("/category/:categoryID", Category.get);

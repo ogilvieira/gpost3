@@ -401,8 +401,6 @@ exports.lock = async (data, req, res, next) => {
       });
     }
 
-    console.log('errr lock ', err);
-
     return res.status(403).send(err instanceof ErrorModel ? err : new ErrorModel(err && err.message ? err.message : "Erro ao tentar bloquear item.", models));
 
   }
@@ -422,4 +420,110 @@ exports.unlock = async (data, req, res, next) => {
 
   let response = await ArticleSchema.update({ is_editing_by: ""}, { where: { id: req.params.id }});
   return res.send(new SuccessModel("Item desbloqueado para edição com sucesso."));
+}
+
+
+/**
+ * @route GET /rest/posttype/{id}/featured
+ * @group Post Type
+ * @param {integer} id.path
+ * @returns {Array<Article>} 200
+ * @returns {Error.model} 401
+ * @security JWTs
+ */
+exports.getFeatured = async (data, req, res, next) => {
+
+  const id = req.params.id;
+
+  if(!id) { return res.status(403).send(new ErrorModel()) }
+
+  var idList = [];
+
+  await AssociationSchema.findAll({ 
+    attributes: ["value"],
+    where: {
+      type: "ARTICLE_FEATURED",
+      target: id,
+    },
+  }).then((items) => {
+    idList = items.map(a => a.value);
+  });
+
+
+  if(!idList.length){ return res.send([]); }
+
+
+  try {
+
+    var response = await ArticleSchema.findAll({
+      where: {
+        id: {
+          [Sequelize.Op.in] : idList
+        },
+        parent: id
+      }
+    });
+
+    response = await Promise.all(response.map(async (a) => {
+      a = new ArticleModel(a).Populate();
+      return a;
+    }));
+
+    return res.send(response);
+
+  } catch( err ) {
+
+    let models = {}
+    if(err.errors) {
+      err.errors.map(a => {
+        models[a.path] = a.message;
+      });
+    }
+
+    return res.status(403).send(err instanceof ErrorModel ? err : new ErrorModel(err && err.message ? err.message : "Erro ao tentar buscar itens.", models));
+  }
+}
+
+/**
+ * @route PUT /rest/posttype/{id}/featured
+ * @group Post Type
+ * @param {integer} id.path
+ * @param {Array<integer>} articlesIds.query - Integers separated by comma
+ * @returns {Success.model} 200
+ * @returns {Error.model} 401
+ * @security JWTs
+ */
+exports.updateFeatured = async (data, req, res, next) => {
+
+  const id = req.params.id;
+
+
+  if(!id) { return res.status(403).send(new ErrorModel()) }
+
+
+  if( !req.query.articlesIds ) { return res.status(403).send(new ErrorModel("articlesIds it's required.")) }
+
+  var articlesIds = req.query.articlesIds.split(',').filter(a => !isNaN(a));
+
+  await AssociationSchema.destroy({
+    where: {
+      target: id,
+      type: 'ARTICLE_FEATURED'
+    }
+  });
+
+
+  let associations = [];
+
+  articlesIds.forEach(a => {
+    associations.push({ target: id, value: a, type: "ARTICLE_FEATURED", key: "featured" })
+  });
+
+  if( associations ) {
+    await AssociationSchema.bulkCreate(associations);
+  }
+
+
+  res.send(new SuccessModel("Artigos em destaque atualizados."));
+
 }

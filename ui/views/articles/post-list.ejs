@@ -47,11 +47,11 @@
               </span>
             </button>
 
-            <button class="button is-rounded is-small" v-if="filterForm">
+            <button class="button is-rounded is-small" v-if="filterForm" v-on:click="openFilter()">
               <span class="icon">
                 <i class="fas fa-filter"></i>
               </span>
-              <span v-on:click="openFilter()">
+              <span>
                 Editar filtros
               </span>
             </button>

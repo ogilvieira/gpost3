@@ -1,0 +1,82 @@
+<% layout('../ui.layout') -%>
+<section class="hero">
+  <div class="hero-body">
+    <div class="container">
+
+    <div class="columns">
+
+      <div class="column has-text-right">
+        <button class="button is-success">
+          <span class="icon">
+            <i class="fas fa-save"></i>
+          </span>
+          <span>Salvar</span>
+        </button>
+
+        <div class="mt-2" v-if="JSON.stringify(dataRaw) != JSON.stringify(data)">
+          <a href="javascript:void(0);" v-on:click="discard()"><i class="fas fa-trash"></i> Descartar alterações </a>
+        </div>
+      </div>
+    </div>
+
+    <hr class="mt-0 mb-3">
+
+    <div class="columns" v-if="isProcessing && !loaded">
+      <div class="column">
+        <div class="box is-size-6"> <i class="fas fa-sync-alt fa-spin mr-2"></i> Carregando...</div>
+      </div>
+    </div>
+
+    <div class="columns" v-if="loaded && !data.length">
+      <div class="column">
+        <div class="notification">
+
+          <div class="mb-2"><i class="fas fa-exclamation-circle mr-1"></i> Nenhum item encontrado.</div>
+
+          <button class="button is-rounded is-small" v-on:click="fetchInfo()" v-bind:class="{'is-loading' : isProcessing }">
+            <span class="icon">
+              <i class="fas fa-sync-alt"></i>
+            </span>
+            <span>
+              Tentar Novamente
+            </span>
+          </button>
+
+        </div>
+      </div>
+    </div>
+
+    <draggable v-model="data" dragable=".box" v-if="data.length && !isUploading" @change="setOrder()" handle=".handle">
+      <transition-group>
+        <div class="box" v-for="(item, index) in data" :key="item.id">
+          <div class="columns is-flex-wrap-wrap is-align-items-center">
+
+            <div class="column is-6 pb-0 pt-0">
+              <div class="button is-small handle is-movable" title="Ordernar"><i class="fas fa-arrows-alt"></i></div>
+              <span class="tag is-warning">
+                <i class="fas fa-hashtag mr-1"></i><strong v-text="index+1">1</strong>
+              </span>
+            </div>
+            <div class="column is-6 p-0 has-text-right">
+              <button class="button is-small is-danger mr-2" title="Remover" :disabled="isProcessing" v-on:click="removeItem(item)"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="column is-12">
+              <div class="title is-5">Titulo</div>
+            </div>
+
+
+          </div>
+        </div>
+      </transition-group>
+
+    </draggable>
+
+    <button slot="footer" class="button is-large is-fullwidth mt-2 mb-5" v-on:click="addNew()" :disabled="data.filter(a => a.isNew).length >= 3">
+      <span class="icon"><i class="fa fa-plus-circle"></i></span> <span>Adicionar Novo</span>
+    </button>
+
+
+    </div>
+  </div>
+</section>

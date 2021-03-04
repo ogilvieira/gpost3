@@ -13,6 +13,11 @@ exports.categories = async (data, req, res, next) => {
   return res.render('articles/categories', data);
 }
 
+exports.featured = async (data, req, res, next) => {
+  data.SITE.title = "Itens em Destaque";
+  return res.render('articles/featured', data);
+}
+
 exports.postEdit = async (data, req, res, next) => {
   data.posttype = req.params.posttypeID;
   data.ID = req.params.id;
