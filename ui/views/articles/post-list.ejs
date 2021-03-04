@@ -6,13 +6,6 @@
       <div class="columns has-text-right">
         <div class="column">
 
-          <div class="select">
-            <select>
-              <option>Todos os Artigos</option>
-              <option>Somente os meus</option>
-            </select>
-          </div>
-
           <a :href="'/articles/'+postTypeID+'/new'" class="button is-warning">
             <span class="icon">
               <i class="fas fa-plus-square"></i>
@@ -20,11 +13,12 @@
             <span>Novo</span>
           </a>
 
-          <button class="button">
+          <button class="button" v-on:click="openFilter()" v-bind:class="{'is-loading' : isProcessing}">
             <span class="icon">
               <i class="fas fa-filter"></i>
             </span>
             <span>Filtrar</span>
+            <span v-if="filterForm && Object.values(filterForm).length > 0" class="tag is-danger is-rounded ml-2">{{Object.values(filterForm).length}}</span>
           </button>
 
         </div>
@@ -38,7 +32,7 @@
         </div>
       </div>
 
-      <div class="columns" v-if="(!data || !data.docs) && !isProcessing">
+      <div class="columns" v-if="(!data || !data.docs || !data.docs.length) && !isProcessing">
         <div class="column">
           <div class="notification">
 
@@ -53,12 +47,12 @@
               </span>
             </button>
 
-            <button class="button is-rounded is-small">
+            <button class="button is-rounded is-small" v-if="filterForm">
               <span class="icon">
                 <i class="fas fa-filter"></i>
               </span>
-              <span>
-                Remover filtros
+              <span v-on:click="openFilter()">
+                Editar filtros
               </span>
             </button>
 

@@ -10,6 +10,12 @@ const ImageManager = require('../../core/ImageManager');
  * @route GET /rest/articles/posttype/{id}
  * @group Post Type
  * @param {integer} id.path
+ * @param {integer} posttype.query
+ * @param {integer} paginate.query
+ * @param {integer} page.query
+ * @param {integer} category.query
+ * @param {integer} author.query
+ * @param {string} terms.query
  * @returns {Array<Article>} 200
  * @returns {Error.model} 401
  * @security JWT
@@ -19,6 +25,10 @@ exports.getAll = async (data, req, res, next) => {
   const parentID = req.params.id;
   const page = Number(req.query.page) || 1;
   const terms = req.query.terms || null;
+  const category = req.query.category || null;
+  const author = req.query.author || null;
+  var custom_fields = req.query.custom_fields || null;
+  var except = req.query.except || null;
   var paginate = Number(req.query.paginate);
 
   if( Number.isNaN(paginate) ) {
@@ -58,6 +68,56 @@ exports.getAll = async (data, req, res, next) => {
     }
   };
 
+  if( category ) {
+    objQuery.where.category = category;
+  }
+
+  if( author ) {
+    objQuery.where.author = author;
+  }
+
+  // FILTER BY CUSTOM FIELD
+  if( custom_fields ) {
+    let customFieldObj = {};
+
+    custom_fields = custom_fields.split(";");
+    custom_fields.map(a => {
+      if( a.split(":").length == 2 ) {
+        customFieldObj = {
+          key: a.split(":")[0],
+          value: a.split(":")[1],
+        };
+      }
+    });
+
+    if( Object.values(customFieldObj) ) {
+      let arrCFPosts = [];
+
+      let associations = await AssociationSchema.findAll({
+          attributes: ['target'],
+          where: {
+            type: "ARTICLE_CUSTOM_FIELD",
+            key: customFieldObj.key,
+            value: customFieldObj.value
+          }}
+        );
+
+      associations && associations.map(a => {
+        arrCFPosts.push(a.target);
+      });
+
+
+      if( !objQuery.where.id ){ objQuery.where.id = {} }
+      objQuery.where.id[Sequelize.Op.in] = arrCFPosts;
+
+    }
+  }
+
+  // IGNORE IDS
+  if( except ) {
+    if( !objQuery.where.id ){ objQuery.where.id = {} }
+    objQuery.where.id[Sequelize.Op.notIn] = except.split(',').filter( a => isNaN(a) );
+  }
 
   try {
     var response = await ArticleSchema[paginate ? 'paginate' : 'findAll' ](objQuery);
