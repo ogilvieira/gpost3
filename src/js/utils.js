@@ -86,3 +86,7 @@ exports.isValidDate = (d) => {
 exports.randomInt = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1) + min);
 };
+
+exports.isFuture = (dateISO) => {
+  return (new Date(dateISO).getTime() >= new Date().getTime());
+}

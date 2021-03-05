@@ -1,6 +1,7 @@
 import Vue from "vue";
 import CategoryEditor from "./_CategoryEditor.vue";
 import FormFilter from "./_FormFilter.vue";
+import ArticleFinder from "./_ArticleFinder.vue";
 
 (function (window) {
   if (window.Modal) {
@@ -21,7 +22,8 @@ import FormFilter from "./_FormFilter.vue";
       modalClassName: "",
       modals: {
         CATEGORY_EDITOR: CategoryEditor,
-        FORM_FILTER: FormFilter
+        FORM_FILTER: FormFilter,
+        ARTICLE_FINDER: ArticleFinder
       },
     },
     template: `

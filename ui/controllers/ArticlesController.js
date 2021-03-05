@@ -15,6 +15,7 @@ exports.categories = async (data, req, res, next) => {
 
 exports.featured = async (data, req, res, next) => {
   data.SITE.title = "Itens em Destaque";
+  data.posttype = req.params.posttypeID;
   return res.render('articles/featured', data);
 }
 

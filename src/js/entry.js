@@ -12,4 +12,5 @@ import "./banner-edit.js";
 import "./banner-items.js";
 import "./post-list.js";
 import "./post-editor.js";
+import "./post-featured.js";
 import "./posttype-edit.js";

@@ -54,9 +54,11 @@
             <a href="/articles/<%=articleArea.id%>/featured" class="navbar-item">
               Destaques
             </a>
+            <% if(SITE.isDev) { %>
             <a href="/articles/<%=articleArea.id%>/categories" class="navbar-item">
               Categorias
             </a>
+            <% } %>
             <% if (userData && (userData.role == 'dev' || userData.role == 'admin')) { %>
             <hr class="navbar-divider">
             <a href="/posttype/<%=articleArea.id%>/edit" class="navbar-item">

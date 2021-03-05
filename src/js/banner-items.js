@@ -226,8 +226,6 @@ if( document.querySelector("[data-vue=banner-items]") ) {
           return this.updateItems(items);
         }
 
-        console.log("Try to insert: ", itemsToInsert);
-
         itemsToInsert.map(a => {
           proms.push(new Promise((resolve, reject) => {
             return this.$http.post(`/rest/banner/${_self.areaID}/item/new`, {

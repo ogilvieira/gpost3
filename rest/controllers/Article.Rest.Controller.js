@@ -116,9 +116,9 @@ exports.getAll = async (data, req, res, next) => {
   // IGNORE IDS
   if( except ) {
     if( !objQuery.where.id ){ objQuery.where.id = {} }
-    objQuery.where.id[Sequelize.Op.notIn] = except.split(',').filter( a => isNaN(a) );
+    objQuery.where.id[Sequelize.Op.notIn] = except.split(',').filter( a => !isNaN(a) );
   }
-
+  
   try {
     var response = await ArticleSchema[paginate ? 'paginate' : 'findAll' ](objQuery);
 
@@ -455,7 +455,7 @@ exports.getFeatured = async (data, req, res, next) => {
 
   try {
 
-    var response = await ArticleSchema.findAll({
+    var dbResponse = await ArticleSchema.findAll({
       where: {
         id: {
           [Sequelize.Op.in] : idList
@@ -464,12 +464,20 @@ exports.getFeatured = async (data, req, res, next) => {
       }
     });
 
-    response = await Promise.all(response.map(async (a) => {
+    dbResponse = await Promise.all(dbResponse.map(async (a) => {
       a = new ArticleModel(a).Populate();
       return a;
     }));
 
-    return res.send(response);
+    let items = [];
+
+    idList.forEach(id => {
+      let item = dbResponse.find(a => a.id == id);
+      if( item ) { items.push(item); }
+    });
+
+
+    return res.send(items);
 
   } catch( err ) {
 

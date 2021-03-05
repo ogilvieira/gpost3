@@ -245,22 +245,33 @@ exports.getFeatured = async (req, res, next) => {
 
   try {
 
-    var response = await ArticleSchema.findAll({
+    var dbResponse = await ArticleSchema.findAll({
       where: {
         id: {
           [Sequelize.Op.in] : idList
         },
-        parent: posttypeID
+        parent: posttypeID,
+        published_date: {
+          [Sequelize.Op.lt] : new Date()
+        },
+        status: 1
       }
     });
 
-    response = await Promise.all(response.map(async (a) => {
+    dbResponse = await Promise.all(dbResponse.map(async (a) => {
       a = new ArticleModel(a).Populate();
       return a;
     }));
 
-    return res.send(response);
+    let items = [];
 
+    idList.forEach(id => {
+      let item = dbResponse.find(a => a.id == id);
+      if( item ) { items.push(item); }
+    }); 
+
+
+    return res.send(items);
   } catch( err ) {
 
     let models = {}
