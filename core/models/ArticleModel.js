@@ -31,7 +31,7 @@ function Article(data) {
   this.id = data.id;
   this.title = data.title;
   this.description = data.description;
-  this.slug = data.slug ? data.slug : (data.title ? slugify(data.title, { replacement: '-', lower: true, remove: /[*+~.()'"!:@]/g }).toLowerCase() : "");
+  this.slug = data.slug ? data.slug : (data.title ? slugify(data.title, { replacement: '-', lower: true, remove: /[*+~.()'"!:@,;]/g }).toLowerCase() : "");
   this.cover = data.cover || "";
   this.content = data.content || "<div></div>";
   this.parent = data.parent || "";

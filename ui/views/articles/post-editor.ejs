@@ -135,7 +135,7 @@
               <ckeditor :editor="editor" @ready="getSavedLocalData" v-model="data.content" :config="editorConfig"></ckeditor>
 
 
-              <div v-if="postType && postType.custom_fields.length">
+              <div v-if="postType && postType.custom_fields && postType.custom_fields.length">
                 <hr>
                 <h2 class="subtitle">Campos Extras</h2>
 

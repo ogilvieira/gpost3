@@ -35,12 +35,11 @@ if( document.querySelector("[data-vue=post-editor]") ) {
         },
         extraPlugins: [ uploader ]
       },
-      loaded: true,
+      loaded: false,
       showOptionsSEO: false,
       localSavedNotification: false,
       cachedTime: null,
       isProcessing: true,
-      isLoaded: false,
       rawData: null,
       editSlug: false,
       data: null,
@@ -80,8 +79,8 @@ if( document.querySelector("[data-vue=post-editor]") ) {
             title: "",
             description: "",
             slug: "",
-            seoTitle: "",
-            seoDescription: "",
+            seo_title: "",
+            seo_description: "",
             cover: "",
             content: "<div></div>",
             status: true,
@@ -120,6 +119,7 @@ if( document.querySelector("[data-vue=post-editor]") ) {
           .then(() => {
             this.rawData = JSON.parse(JSON.stringify(this.data));
             this.isProcessing = false;
+            this.loaded = true;
           });
 
       },
@@ -316,7 +316,7 @@ if( document.querySelector("[data-vue=post-editor]") ) {
         val = slugify(val, {
           replacement: '-',
           lower: true,
-          remove: /[*+~.()'"!:@]/g
+          remove: /[*+~.()'"!:@,;]/g
         });
 
         return val;

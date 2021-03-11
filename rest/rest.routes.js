@@ -81,7 +81,7 @@ module.exports = (app) => {
     .post(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Banner.addItem)
 
   router.route("/posttype/:id")
-    .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, PostType.get)
+    .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, PostType.get)
     .put(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, PostType.update)
 
   router.route("/posttype/:id/categories")

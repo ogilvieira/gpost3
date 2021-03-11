@@ -25,7 +25,7 @@ function ArticleRaw(data) {
   this.id = data.id || "";
   this.title = data.title || "";
   this.description = data.description || "";
-  this.slug = data.slug ? data.slug : (data.title ? slugify(data.title, { replacement: '-', lower: true, remove: /[*+~.()'"!:@]/g }).toLowerCase() : "");
+  this.slug = data.slug ? data.slug : (data.title ? slugify(data.title, { replacement: '-', lower: true, remove: /[*+~.()'"!:@,;]/g }).toLowerCase() : "");
   this.seo_title = data.seo_title || "";
   this.seo_description = data.seo_description  || "";
   this.cover = data.cover || "";
