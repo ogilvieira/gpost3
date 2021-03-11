@@ -71,10 +71,16 @@ if( document.querySelector("[data-vue=post-featured]") ) {
 
         let arr = this.getIdsArr();
 
+        if(!arr.length) {
+          let confirm = window.confirm("Deseja salvar sem nenhum destaque?");
+          if(!confirm){ return; }
+        }
+        
         let _self = this;
         _self.isProcessing = true;
 
-        this.$http.put(`/rest/posttype/${this.postTypeID}/featured?articlesIds=${arr.join(',')}`)
+
+        this.$http.put(`/rest/posttype/${this.postTypeID}/featured?articlesIds=${arr ? arr.join(',') : '[]'}`)
           .then(res => {
             _self.$toast.open("Items atualizados com sucesso.");
             _self.fetchInfo();

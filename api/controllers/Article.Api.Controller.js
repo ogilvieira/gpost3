@@ -223,8 +223,6 @@ exports.getFeatured = async (req, res, next) => {
 
   const posttypeID = req.params.posttypeID;
 
-  console.log(posttypeID);
-
   if(!posttypeID) { return res.status(403).send(new ErrorModel()) }
 
   var idList = [];
