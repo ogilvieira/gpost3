@@ -68,17 +68,6 @@ exports.index = async (req, res) => {
     })
   )
 
-  proms.push(
-    ConfigSchema.create({
-      key_value: 0,
-      key_name: 'Fornecer páginas AMP',
-      key_slug: 'siteamp',
-      key_type: 'BOOLEAN',
-      custom_type: 1
-    })
-  )
-
-
   if( !posttypeData || !posttypeData.length ) {
     proms.push(PostTypeSchema.create({
       title: "Posts",

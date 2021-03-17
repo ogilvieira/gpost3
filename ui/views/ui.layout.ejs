@@ -81,6 +81,23 @@
         </a>
         <% } %>
 
+        <% if (userData && (userData.role == 'dev' || userData.role == 'admin')) { %>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link">
+            <i class="mr-1 fas fa-tools"></i> Ferramentas
+          </a>
+
+          <div class="navbar-dropdown">
+            <a href="/tools/log" class="navbar-item">
+              Gerenciar Log
+            </a>
+            <a href="/tools/backup" class="navbar-item">
+              Gerenciar Backup
+            </a>
+          </div>
+        </div>
+        <% } %>
+
         <a href="<%=SITE.config.siteurl%>" target="_blank" class="navbar-item has-text-info">
           <small><%=SITE.config.sitename%> <i class="ml-1 fas fa-external-link-alt"></i></small>
         </a>

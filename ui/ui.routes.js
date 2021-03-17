@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
+const AuthGuard = require("../core/AuthGuard");
+
 const Base = require('./controllers/BaseController.js');
 const Login = require('./controllers/LoginController.js');
 const Home = require('./controllers/HomeController.js');
@@ -9,8 +11,7 @@ const Banners = require('./controllers/BannersController.js');
 const Users = require('./controllers/UsersController.js');
 const Config = require('./controllers/ConfigController.js');
 const Articles = require('./controllers/ArticlesController.js');
-const AuthGuard = require("../core/AuthGuard");
-const Tools = require("../core/Tools");
+const Tools = require("./controllers/ToolsController");
 
 module.exports = (app) => {
 
@@ -46,9 +47,9 @@ module.exports = (app) => {
     return data.userData.role == 'dev' ? next() : res.redirect('/');
   })
 
-  router.get('/tools/log', AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, Tools.log);
+  router.get('/tools/log', AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, Base.index, Tools.log);
   
-  router.get('/tools/backup', AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, Tools.backup);
+  router.get('/tools/backup', AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, Base.index, Tools.backup);
   
 
   router.get('/logout', (req, res) => {
