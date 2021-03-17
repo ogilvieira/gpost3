@@ -1,6 +1,6 @@
+.env
 node_modules/
 public/upload/
 public/assets/script.js
 public/assets/script.js.map
 public/assets/style.css
-.env
