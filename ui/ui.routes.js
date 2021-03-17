@@ -10,11 +10,12 @@ const Users = require('./controllers/UsersController.js');
 const Config = require('./controllers/ConfigController.js');
 const Articles = require('./controllers/ArticlesController.js');
 const AuthGuard = require("../core/AuthGuard");
+const Tools = require("../core/Tools");
 
 module.exports = (app) => {
 
   router.get('/login', (req, res, next) => {
-    if( req.cookies.token ) {
+    if( req.cookies.gpost_token ) {
       return res.redirect('/');
     }
 
@@ -45,8 +46,13 @@ module.exports = (app) => {
     return data.userData.role == 'dev' ? next() : res.redirect('/');
   })
 
+  router.get('/tools/log', AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, Tools.log);
+  
+  router.get('/tools/backup', AuthGuard.checkAuthorization, AuthGuard.checkToBlock, AuthGuard.checkAdmin, Tools.backup);
+  
+
   router.get('/logout', (req, res) => {
-    res.clearCookie('token');
+    res.clearCookie('gpost_token');
     res.redirect('/login');
   })
 

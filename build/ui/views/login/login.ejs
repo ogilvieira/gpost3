@@ -1,0 +1,52 @@
+<% layout('../ui.layout') -%>
+<section class="hero is-fullheight is-info">
+  <div class="hero-body">
+    
+    <div class="container" style="max-width: 400px;" >
+      <div class="box" data-vue="login" v-cloak>
+        
+        <div class="is-flex is-justify-content-center is-align-items-center">
+          <figure style="max-width: 150px;" class="mb-5">
+            <img class="image" src="<%= SITE.config.sitelogo ? SITE.config.sitelogo : '/assets/logo.png' %>">
+          </figure>
+
+        </div>
+
+        <form v-on:submit="checkLogin">
+          <div class="field">
+            <label class="label">E-mail</label>
+            <div class="control has-icons-left">
+              <span class="icon is-medium is-left">
+                <i class="fas fa-envelope"></i>
+              </span>
+              <input class="input" v-model="form.email" type="email" minlength="6" v-bind:class="{'is-danger' : errors && errors.find(a => a.model == 'email')}" :disabled="isProcessing">
+            </div>
+          </div> 
+
+          <div class="field">
+            <label class="label">Senha</label>
+            <div class="control has-icons-left">
+              <span class="icon is-medium is-left">
+                <i class="fas fa-key"></i>
+              </span>
+              <input class="input" v-model="form.password" type="password" minlength="6" v-bind:class="{'is-danger' : errors && errors.find(a => a.model == 'password')}" :disabled="isProcessing">
+            </div>
+          </div>  
+
+          <div v-if="errors && errors.length" class="notification is-danger">
+            <p v-for="error in errors" v-text="error.message"></p>
+          </div>
+
+          <div class="control">
+            <button type="submit" class="button is-info is-primary is-fullwidth is-uppercase" :disabled="isProcessing" v-bind:class="{'is-loading' : isProcessing }">Login</button>
+          </div>
+        </form>
+
+        <div class="is-text-center is-size-7 mt-3 has-text-grey-light has-text-centered">
+          <em>GPost <%=SITE.version%></em>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>

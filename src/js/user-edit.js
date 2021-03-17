@@ -41,8 +41,8 @@ if( document.querySelector("[data-vue=user-edit]") ) {
         this.$http.get(`/rest/user/${this.userID}`)
           .then(res => {
             Object.keys(this.form).map(a => {
-              this.form[a] = (res.data[a] || "")+'';
-              this.formRef[a] = (res.data[a] || "")+'';
+              this.form[a] = typeof res.data[a] != 'undefined' ? res.data[a] : '';
+              this.formRef[a] = typeof res.data[a] != 'undefined' ? res.data[a] : '';
             })
           })
           .catch(err => {

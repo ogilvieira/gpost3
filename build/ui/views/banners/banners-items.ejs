@@ -1,0 +1,185 @@
+<% layout('../ui.layout') -%>
+<section class="hero" data-vue="banner-items" data-area-id="<%=areaID%>" v-cloak>
+  <div class="hero-body">
+    <div class="container">
+
+    <div class="columns">
+      <div class="column" v-if="area">
+        <h2 class="subtitle mb-1"><i class="fas fa-images mr-2 has-text-info"></i> <strong v-text="area.title"></strong></h2>
+        <code class="is-size-7"><i class="fas fa-code mr-1"></i>id: <span v-text="area.id"></span></code>
+      </div>
+
+      <div class="column has-text-right">
+
+        <button class="button is-small" v-bind:class="{'is-loading' : isProcessing }" v-on:click="openLog()"><i class="fa fa-list-alt mr-1"></i> Log</button>
+
+        <a href="/banners" class="button is-small">
+          <span class="icon">
+            <i class="fas fa-caret-left"></i>
+          </span>
+          <span>Voltar</span>
+        </a>
+
+        <button class="button is-success is-small" v-on:click="save()" :disabled="(uploadErros && !!uploadErros.length) || (JSON.stringify(dataRaw) == JSON.stringify(data))" v-bind:class="{'is-loading' : (isProcessing || isUploading)}">
+          <span class="icon">
+            <i class="fas fa-save"></i>
+          </span>
+          <span>Salvar</span>
+        </button>
+
+        <div class="mt-2" v-if="JSON.stringify(dataRaw) != JSON.stringify(data)">
+          <a href="javascript:void(0);" v-on:click="discard()"><i class="fas fa-trash"></i> Descartar alterações </a>
+        </div>
+      </div>
+    </div>
+
+    <hr class="mt-0 mb-3">
+
+    <div class="columns" v-if="isUploading">
+      <div class="column">
+        <div class="box is-size-6"> <i class="fas fa-sync-alt fa-spin mr-2"></i>
+          <span v-text="uploadsItemsCompleted+'/'+uploadStepItems"></span>
+          <span v-if="uploadStep == 1">Fazendo upload de imagens...</span>
+          <span v-if="uploadStep == 2">Criando novos itens...</span>
+          <span v-if="uploadStep == 3">Atualizando itens...</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="columns" v-if="!isUploading && uploadErros.length">
+      <div class="column">
+        <div class="notification is-danger">
+
+          <div class="mb-2"><i class="fas fa-exclamation-circle mr-1"></i> Não foi possível processar alguns dos itens.</div>
+
+          <button class="button is-rounded is-small" v-on:click="save(uploadErros)">
+            <span class="icon">
+              <i class="fas fa-sync-alt"></i>
+            </span>
+            <span>
+              Tentar Novamente
+            </span>
+          </button>
+
+        </div>
+      </div>
+    </div>
+    <div class="columns" v-if="isProcessing && !loaded">
+      <div class="column">
+        <div class="box is-size-6"> <i class="fas fa-sync-alt fa-spin mr-2"></i> Carregando...</div>
+      </div>
+    </div>
+
+    <div class="columns" v-if="loaded && !data.length">
+      <div class="column">
+        <div class="notification">
+
+          <div class="mb-2"><i class="fas fa-exclamation-circle mr-1"></i> Nenhum item encontrado.</div>
+
+          <button class="button is-rounded is-small" v-on:click="fetchInfo()" v-bind:class="{'is-loading' : isProcessing }">
+            <span class="icon">
+              <i class="fas fa-sync-alt"></i>
+            </span>
+            <span>
+              Tentar Novamente
+            </span>
+          </button>
+
+        </div>
+      </div>
+    </div>
+
+    <draggable v-model="data" dragable=".box" v-if="data.length && !isUploading" @change="setOrder()" handle=".handle">
+      <transition-group>
+        <div class="box" v-for="(item, index) in data" :key="item.id">
+          <div class="columns is-flex-wrap-wrap is-align-items-center">
+
+            <div class="column is-6 pb-0 pt-0">
+              <div class="button is-small handle is-movable" title="Ordernar"><i class="fas fa-arrows-alt"></i></div>
+              <span class="tag is-warning">
+                <i class="fas fa-hashtag mr-1"></i><strong v-text="index+1"></strong>
+              </span>
+            </div>
+            <div class="column is-6 p-0 has-text-right">
+              <button class="button is-small is-danger mr-2" title="Remover" :disabled="isProcessing" v-on:click="removeItem(item)"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="column is-4">
+              <input-image v-model="item.image" :invalid="errors && !!errors.find(a => a.model == (item.id+'_image'))" v-on:deleteupload="save(item.id)" :candelete="false"></input-image>
+            </div>
+
+            <div class="column is-4">
+              <div class="field">
+                <div class="control has-icons-left">
+                  <input class="input is-small" v-model="item.title" placeholder="Titulo" type="text" minlength="6" v-bind:class="{'is-danger' : errors && errors.find(a => a.model == (item.id+'_title'))}" :disabled="isProcessing" required>
+                  <span class="icon is-small is-left">
+                    <i class="fas fa-font"></i>
+                  </span>
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="control has-icons-left">
+                  <input class="input is-small" v-model="item.link" placeholder="Link" pattern="https://.*" type="url" minlength="6" v-bind:class="{'is-danger' : errors && errors.find(a => a.model == (item.id+'_link'))}" :disabled="isProcessing" required>
+                  <span class="icon is-small is-left">
+                    <i class="fas fa-link"></i>
+                  </span>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="column is-4">
+
+              <div class="field is-horizontal">
+                <div class="field-label is-small">
+                  <label class="label">De</label>
+                </div>
+                <div class="field-body">
+                  <div class="field">
+                    <p class="control">
+                      <input-datetime v-model="item.start_date" class="input is-small" v-bind:class="{'is-danger' : errors && errors.find(a => a.model == (item.id+'_start'))}"></input-datetime>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field is-horizontal">
+                <div class="field-label is-small">
+                  <label class="label">Até</label>
+                </div>
+                <div class="field-body">
+                  <div class="field">
+                    <p class="control">
+                      <input-datetime :min="item.start" v-model="item.end_date" class="input is-small" v-bind:class="{'is-danger' : errors && errors.find(a => a.model == (item.id+'_end'))}" :required="true" ></input-datetime>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="column is-12" v-if="errors && errors.find(a => a.model.startsWith(item.id+'_'))">
+              <div class="notification is-danger">
+                <p v-for="error in errors.filter(a => a.model.startsWith(item.id+'_'))" v-text="error.message"></p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </transition-group>
+
+    </draggable>
+
+    <div class="notification is-danger mt-3" v-if="data.filter(a => a.isNew).length >= 3">
+      <i class="fa fa-exclamation-circle mr-1"></i> Salve as alterações ou remova banner não salvos para poder adicionar novos banners.
+    </div>
+
+    <button slot="footer" class="button is-large is-fullwidth mt-2 mb-5" v-on:click="addNew()" :disabled="data.filter(a => a.isNew).length >= 3">
+      <span class="icon"><i class="fa fa-plus-circle"></i></span> <span>Adicionar Novo</span>
+    </button>
+
+
+    </div>
+  </div>
+</section>
