@@ -81,7 +81,7 @@
         </a>
         <% } %>
 
-        <% if (userData && (userData.role == 'dev' || userData.role == 'admin')) { %>
+        <% if (SITE.isDev && userData && (userData.role == 'dev' || userData.role == 'admin')) { %>
         <div class="navbar-item has-dropdown is-hoverable">
           <a class="navbar-link">
             <i class="mr-1 fas fa-tools"></i> Ferramentas
