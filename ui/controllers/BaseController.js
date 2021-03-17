@@ -1,6 +1,7 @@
 const { ConfigSchema, PostTypeSchema } = require("../../core/schemas.js");
 const AuthModel = require("../../core/models/AuthModel.js");
 const UserModel = require("../../core/models/UserModel.js");
+const pjson = require('../../package.json');
 
 require("dotenv").config();
 
@@ -21,6 +22,7 @@ exports.index = async (data, req, res, next) => {
     subPageActive: null,
     articlesAreas: null,
     config: {},
+    version: pjson.version,
     breadcrumbs: [
       {
         name: "Home",

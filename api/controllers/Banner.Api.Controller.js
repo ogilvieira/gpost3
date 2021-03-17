@@ -40,7 +40,7 @@ exports.get = async (req, res, next) => {
     var banners = await BannerSchema.findAll(query);
     return res.send(banners);
   } catch (err) {
-    console.log(err);
+    console.log('err ',err);
     return res.status(404).send(new ErrorModel("Área de banner não encontrada."));
   }
 

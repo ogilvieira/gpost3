@@ -2,6 +2,7 @@ import Vue from "vue";
 import CategoryEditor from "./_CategoryEditor.vue";
 import FormFilter from "./_FormFilter.vue";
 import ArticleFinder from "./_ArticleFinder.vue";
+import Log from "./_Log.vue";
 
 (function (window) {
   if (window.Modal) {
@@ -23,7 +24,8 @@ import ArticleFinder from "./_ArticleFinder.vue";
       modals: {
         CATEGORY_EDITOR: CategoryEditor,
         FORM_FILTER: FormFilter,
-        ARTICLE_FINDER: ArticleFinder
+        ARTICLE_FINDER: ArticleFinder,
+        LOG: Log
       },
     },
     template: `

@@ -104,7 +104,11 @@ if( document.querySelector("[data-vue=post-featured]") ) {
           this.items.push(item);
         }
       },
-      isFuture: isFuture
+      isFuture: isFuture,
+      openLog() {
+        if(this.MODE == 'new') { return; }
+        Modal.open("LOG", { type: "ARTICLE_FEATURED", target: this.postTypeID });
+      }
     },
     created: function() {
       this.fetchInfo();

@@ -264,8 +264,10 @@ if( document.querySelector("[data-vue=banner-items]") ) {
       },
       updateItems(items) {
         this.uploadStep = 3;
+
         let itemsToUpdate = items.filter(a => {
-          return this.dataRaw.find(b => JSON.stringify(b) != JSON.stringify(a));
+          let aRaw = this.dataRaw.find( b => b.id == a.id);
+          return aRaw && JSON.stringify(aRaw) != JSON.stringify(a);
         });
 
 
@@ -330,6 +332,9 @@ if( document.querySelector("[data-vue=banner-items]") ) {
         if(!confirm){ return; }
 
         this.data = JSON.parse(JSON.stringify(this.dataRaw));
+      },
+      openLog() {
+        Modal.open("LOG", { type: "BANNER", target: this.areaID });
       }
     },
     created: function() {

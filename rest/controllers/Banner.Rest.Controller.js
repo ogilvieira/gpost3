@@ -2,7 +2,7 @@ const ErrorModel = require('../../core/models/ErrorModel');
 const SuccessModel = require('../../core/models/SuccessModel');
 const BannerModel = require('../../core/models/BannerModel');
 const TaxonomyModel = require('../../core/models/TaxonomyModel');
-const { TaxonomySchema, BannerSchema, Sequelize } = require('../../core/schemas');
+const { TaxonomySchema, BannerSchema, LogSchema, Sequelize } = require('../../core/schemas');
 const ImageManager = require('../../core/ImageManager');
 
 
@@ -69,6 +69,9 @@ exports.add = async (data, req, res, next) => {
 
   try {
     var banner = await TaxonomySchema.create(BannerArea);
+
+    await LogSchema.create({ user: data.userData.id, action: 'CREATE', target: banner.id, type: 'BANNER_AREA' });
+    
     return res.send(new SuccessModel("Área de banner criada com sucesso.", new TaxonomyModel(banner)));
   } catch (err) {
 
@@ -107,6 +110,9 @@ exports.update = async (data, req, res, next) => {
 
   try {
     var banner = await TaxonomySchema.update(BannerArea, { where: { id: id }});
+    
+    await LogSchema.create({ user: data.userData.id, action: 'UPDATE', target: id, type: 'BANNER_AREA' });
+
     return res.send(new SuccessModel("Área de Banner atualizada com sucesso.", new TaxonomyModel(banner)));
   } catch (err) {
 
@@ -175,6 +181,9 @@ exports.updateItem = async (data, req, res, next) => {
 
   try {
     await BannerSchema.update(item, { where: { id: itemID, category: category }});
+
+    await LogSchema.create({ user: data.userData.id, action: 'UPDATE', target: category, type: 'BANNER' });
+
     return res.send(new SuccessModel("Item de Banner atualizado com sucesso."));
   } catch (err) {
 
@@ -218,7 +227,8 @@ exports.addItem = async (data, req, res, next) => {
   item.category = id;
 
   try {
-    await BannerSchema.create(item);
+    let bannerItem = await BannerSchema.create(item);
+    await LogSchema.create({ user: data.userData.id, action: 'CREATE', target: bannerItem.category, type: 'BANNER' });
     return res.send(new SuccessModel("Item de Banner criado com sucesso."));
   } catch (err) {
 
@@ -261,6 +271,7 @@ exports.deleteItem = async (data, req, res, next) => {
 
   try {
     await BannerSchema.destroy({ where: { id: itemID, category: category }});
+    await LogSchema.create({ user: data.userData.id, action: 'DELETE', target: category, type: 'BANNER' });
     return res.send(new SuccessModel("Item de Banner excluído com sucesso."));
   } catch (err) {
 

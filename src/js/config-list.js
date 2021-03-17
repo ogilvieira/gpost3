@@ -85,6 +85,9 @@ if( document.querySelector("[data-vue=config-list]") ) {
           .then( response => {
             this.isProcessing = false;
           })
+      },
+      openLog(id) {
+        Modal.open("LOG", { type: "CONFIG", target: id });
       }
     },
     created: function() {

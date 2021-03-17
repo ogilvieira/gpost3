@@ -30,6 +30,16 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       defaultValue: true
     },
+    status: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true
+    },
+    archived: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
+    },
     parent: {
       type: DataTypes.STRING,
       defaultValue: "1"

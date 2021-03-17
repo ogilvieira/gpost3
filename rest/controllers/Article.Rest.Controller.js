@@ -3,8 +3,9 @@ const SuccessModel = require('../../core/models/SuccessModel');
 const ArticleModelRaw = require('../../core/models/ArticleModelRaw');
 const ArticleModel = require('../../core/models/ArticleModel');
 const CustomFieldModel = require('../../core/models/CustomFieldModel');
-const { ArticleSchema, AssociationSchema, PostTypeSchema, Sequelize } = require('../../core/schemas');
+const { ArticleSchema, AssociationSchema, PostTypeSchema, Sequelize, LogSchema } = require('../../core/schemas');
 const ImageManager = require('../../core/ImageManager');
+const ArticleQueryModel = require('../../core/models/ArticleQueryModel');
 
 /**
  * @route GET /rest/articles/posttype/{id}
@@ -21,105 +22,43 @@ const ImageManager = require('../../core/ImageManager');
  * @security JWT
  */
 exports.getAll = async (data, req, res, next) => {
-
-  const parentID = req.params.id;
+  const posttypeID = req.params.id;
   const page = Number(req.query.page) || 1;
   const terms = req.query.terms || null;
   const category = req.query.category || null;
   const author = req.query.author || null;
-  var custom_fields = req.query.custom_fields || null;
-  var except = req.query.except || null;
-  var paginate = Number(req.query.paginate);
+  const custom_fields = req.query.custom_fields || null;
+  const except = req.query.except || null;
+  const paginate = req.query.paginate || 10;
+  const status = req.query.status ? Number(req.query.paginate) : null;
+  const tag = req.query.tag || null;
+  const archived = req.query.archived && req.query.archived == 1;
 
-  if( Number.isNaN(paginate) ) {
-    paginate = 10;
+  //validate posttype
+  const posttypeList = await PostTypeSchema.findAll({ where: { system: "ARTICLE" } });
+  if(!posttypeList || (posttypeID && !posttypeList.find(a => a.id == posttypeID))){
+    return res.status(404).send(new ErrorModel(posttypeID ? "PostType selecionado não existe ou não é público." : "Não há PostTypes públicos."));
   }
 
-  if(!parentID){ return next(); }
+  let articleQuery = new ArticleQueryModel({
+    posttypeID: posttypeID,
+    page: page,
+    terms: terms,
+    category: category,
+    tag: tag,
+    custom_fields: custom_fields,
+    except: except,
+    paginate: paginate,
+    status: status,
+    author: author,
+    archived: archived
+  });
 
-  let objQuery = {
-    where: { parent: parentID },
-    order: [['published_date', 'DESC']]
-  }
-
-  if( paginate ) {
-    objQuery.page = page;
-    objQuery.paginate = paginate;
-  }
-
-
-  if( terms ) {
-    objQuery.where[Sequelize.Op.or] = {
-      title: {
-        [Sequelize.Op.like]: `%${terms}%`
-      },
-      content: {
-        [Sequelize.Op.like]: `%${terms}%`
-      },
-      description: {
-        [Sequelize.Op.like]: `%${terms}%`
-      },
-      seo_description: {
-        [Sequelize.Op.like]: `%${terms}%`
-      },
-      seo_title: {
-        [Sequelize.Op.like]: `%${terms}%`
-      }
-    }
-  };
-
-  if( category ) {
-    objQuery.where.category = category;
-  }
-
-  if( author ) {
-    objQuery.where.author = author;
-  }
-
-  // FILTER BY CUSTOM FIELD
-  if( custom_fields ) {
-    let customFieldObj = {};
-
-    custom_fields = custom_fields.split(";");
-    custom_fields.map(a => {
-      if( a.split(":").length == 2 ) {
-        customFieldObj = {
-          key: a.split(":")[0],
-          value: a.split(":")[1],
-        };
-      }
-    });
-
-    if( Object.values(customFieldObj) ) {
-      let arrCFPosts = [];
-
-      let associations = await AssociationSchema.findAll({
-          attributes: ['target'],
-          where: {
-            type: "ARTICLE_CUSTOM_FIELD",
-            key: customFieldObj.key,
-            value: customFieldObj.value
-          }}
-        );
-
-      associations && associations.map(a => {
-        arrCFPosts.push(a.target);
-      });
-
-
-      if( !objQuery.where.id ){ objQuery.where.id = {} }
-      objQuery.where.id[Sequelize.Op.in] = arrCFPosts;
-
-    }
-  }
-
-  // IGNORE IDS
-  if( except ) {
-    if( !objQuery.where.id ){ objQuery.where.id = {} }
-    objQuery.where.id[Sequelize.Op.notIn] = except.split(',').filter( a => !isNaN(a) );
-  }
-  
   try {
+    var objQuery = await articleQuery.Generate();
+
+    if(!objQuery) { throw "Erro ao tentar criar query."; }
+
     var response = await ArticleSchema[paginate ? 'paginate' : 'findAll' ](objQuery);
 
     if( paginate ) {
@@ -173,6 +112,7 @@ exports.post = async (data, req, res, next) => {
     delete article.updated_at;
 
 
+
     let associations = [];
 
     item.tags.map(a => {
@@ -191,6 +131,8 @@ exports.post = async (data, req, res, next) => {
 
     article.custom_fields = item.custom_fields;
     article.tags = item.tags;
+
+    await LogSchema.create({ user: data.userData.id, action: 'CREATE', target: article.id, type: 'ARTICLE' });
 
     return res.send(new SuccessModel("Artigo criado com sucesso.", new ArticleModelRaw(article)));
   } catch (err) {
@@ -292,8 +234,12 @@ exports.update = async (data, req, res, next) => {
       await AssociationSchema.bulkCreate(associations);
     }
 
+    await LogSchema.create({ user: data.userData.id, action: 'UPDATE', target: originalItem.id, type: 'ARTICLE' });
+
     return res.send(new SuccessModel("Item atualizado com sucesso."));
   } catch (err) {
+
+    console.log('err ', err)
 
     let models = {}
     if(err.errors) {
@@ -424,6 +370,39 @@ exports.unlock = async (data, req, res, next) => {
 
 
 /**
+ * @route PUT /rest/article/{id}/archive
+ * @group Articles
+ * @param {integer} id.path.required
+ * @returns {Success.model} 200
+ * @security JWT
+ */
+exports.archive = async (data, req, res, next) => {
+
+  if(!req.params.id || !data.userData){ return next(); }
+
+  let response = await ArticleSchema.update({ is_editing_by: "", archived: 1, status: 0 }, { where: { id: req.params.id }});
+  await LogSchema.create({ user: data.userData.id, action: 'ARCHIVE', target: req.params.id, type: 'ARTICLE' });
+  return res.send(new SuccessModel("Item arquivado com sucesso."));
+}
+
+/**
+ * @route PUT /rest/article/{id}/unarchive
+ * @group Articles
+ * @param {integer} id.path.required
+ * @returns {Success.model} 200
+ * @security JWT
+ */
+exports.unarchive = async (data, req, res, next) => {
+
+  if(!req.params.id || !data.userData){ return next(); }
+
+  let response = await ArticleSchema.update({ is_editing_by: data.userData.id, archived: 0, status: 0 }, { where: { id: req.params.id }});
+  await LogSchema.create({ user: data.userData.id, action: 'UNARCHIVE', target: req.params.id, type: 'ARTICLE' });
+  return res.send(new SuccessModel("Item recuperado com sucesso."));
+}
+
+
+/**
  * @route GET /rest/posttype/{id}/featured
  * @group Post Type
  * @param {integer} id.path
@@ -443,7 +422,7 @@ exports.getFeatured = async (data, req, res, next) => {
     attributes: ["value"],
     where: {
       type: "ARTICLE_FEATURED",
-      target: id,
+      target: id
     },
   }).then((items) => {
     idList = items.map(a => a.value);
@@ -460,7 +439,8 @@ exports.getFeatured = async (data, req, res, next) => {
         id: {
           [Sequelize.Op.in] : idList
         },
-        parent: id
+        parent: id,
+        archived: 0
       }
     });
 
@@ -531,6 +511,7 @@ exports.updateFeatured = async (data, req, res, next) => {
     await AssociationSchema.bulkCreate(associations);
   }
 
+  await LogSchema.create({ user: data.userData.id, action: 'UPDATE', target: id, type: 'ARTICLE_FEATURED' });
 
   res.send(new SuccessModel("Artigos em destaque atualizados."));
 

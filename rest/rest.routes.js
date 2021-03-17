@@ -30,6 +30,7 @@ const PostType = require("./controllers/PostType.Rest.Controller");
 const Category = require("./controllers/Category.Rest.Controller");
 const Article = require("./controllers/Article.Rest.Controller");
 const Tags = require("./controllers/Tags.Rest.Controller");
+const Log = require("./controllers/Log.Rest.Controller");
 
 
 module.exports = (app) => {
@@ -113,9 +114,15 @@ module.exports = (app) => {
   router.put("/article/:id/lock", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Article.lock)
   router.put("/article/:id/unlock", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Article.unlock)
 
+  router.put("/article/:id/archive", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Article.archive)
+  router.put("/article/:id/unarchive", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Article.unarchive)
+
   //Article
   router.route("/tags")
     .get(AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Tags.getAll)
+
+  //Log
+  router.get("/log", AuthGuard.checkAuthorization, AuthGuard.checkToBlock, Log.index);
 
   return router;
 };

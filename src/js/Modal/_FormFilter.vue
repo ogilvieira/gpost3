@@ -56,12 +56,12 @@
 
           <div
             v-if="input.type == 'select'"
-            class="field mb-1"
+            class="field mb-2"
           >
             <label class="label" v-text="input.title" v-if="input.title"></label>
             <div class="select">
               <select v-model="form[key]">
-                <option v-bind:value="null">---</option>
+                <option v-bind:value="null" v-if="!input.options.find(a => !a.split(':')[0])">---</option>
                 <option
                   v-for="option in input.options"
                   v-text="
@@ -69,7 +69,7 @@
                       ? option.split(':')[1]
                       : option.split(':')[0]
                   "
-                  v-bind:value="option.split(':')[0]"
+                  v-bind:value="option.split(':')[0] || null"
                 ></option>
               </select>
             </div>

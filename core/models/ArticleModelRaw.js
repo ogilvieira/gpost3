@@ -42,6 +42,7 @@ function ArticleRaw(data) {
   this.updated_at = data.updatedAt || "";
   this.created_at = data.createdAt || "";
   this.is_editing_by = data.is_editing_by || "";
+  this.archived = !!data.archived;
 
   if(!this.parent) {
     throw new ErrorModel("Article inválido.", { "parent" : "Parent é requerido." });

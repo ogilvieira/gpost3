@@ -25,6 +25,7 @@ const { AssociationSchema, TaxonomySchema, UserSchema } = require('../../core/sc
  * @property {string} slug_key
  * @property {string} lang
  * @property {string} published_date
+ * @property {boolean} archived
  */
 
 function Article(data) {
@@ -46,6 +47,7 @@ function Article(data) {
   this.updated_at = data.updatedAt || new Date().toISOString();
   this.created_at = data.createdAt || new Date().toISOString();
   this.is_editing_by = data.is_editing_by || "";
+  this.archived = !!data.archived;
 
   if(!this.description) {
     this.description = this.content.replace(/(<([^>]+)>)/gi, "");

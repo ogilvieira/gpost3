@@ -10,13 +10,17 @@
       </div>
 
       <div class="column has-text-right">
-        <a href="/banners" class="button">
+
+        <button class="button is-small" v-bind:class="{'is-loading' : isProcessing }" v-on:click="openLog()"><i class="fa fa-list-alt mr-1"></i> Log</button>
+
+        <a href="/banners" class="button is-small">
           <span class="icon">
             <i class="fas fa-caret-left"></i>
           </span>
           <span>Voltar</span>
         </a>
-        <button class="button is-success" v-on:click="save()" :disabled="uploadErros && !!uploadErros.length" v-bind:class="{'is-loading' : (isProcessing || isUploading)}">
+
+        <button class="button is-success is-small" v-on:click="save()" :disabled="(uploadErros && !!uploadErros.length) || (JSON.stringify(dataRaw) == JSON.stringify(data))" v-bind:class="{'is-loading' : (isProcessing || isUploading)}">
           <span class="icon">
             <i class="fas fa-save"></i>
           </span>

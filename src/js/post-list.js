@@ -92,12 +92,22 @@ if( document.querySelector("[data-vue=post-list]") ) {
             "category": {
               type: 'select',
               title: 'Categoria',
-              options: [],
+              options: [':Todas'],
+            },
+            "status": {
+              type: 'select',
+              title: 'Status',
+              options: [':Todos', '0:Rascunho','1:Publicado/Agendado'],
             },
             "author": {
               type: 'select',
-              title: 'Autor',
-              options: [],
+              title: 'Autor(a)',
+              options: [':Todos(as)'],
+            },
+            "archived": {
+              type: 'select',
+              title: 'Arquivo',
+              options: [':Não Arquivados','1:Somente Arquivados'],
             }
           },
           onSubmit: (formData) => {
@@ -106,7 +116,6 @@ if( document.querySelector("[data-vue=post-list]") ) {
 
             if( !Object.values(formData).filter(a => !!a).length ) { 
               _self.filterForm =  null;
-              console.log('none');
             } else {
               _self.filterForm = {};
               _self.page = 1;
@@ -118,12 +127,19 @@ if( document.querySelector("[data-vue=post-list]") ) {
               });
 
             }
-            
+
+            window.sessionStorage.setItem(`post-list-filter_${this.postTypeID}`, JSON.stringify(_self.filterForm));
+
             _self.fetchInfo();
 
           },
           onCancel: () => {
             _self.filterForm = null;
+
+            if( window.sessionStorage.getItem(`post-list-filter_${this.postTypeID}`) ) {
+              window.sessionStorage.removeItem(`post-list-filter_${this.postTypeID}`);
+            }
+
             _self.fetchInfo();
           }
         };
@@ -146,6 +162,11 @@ if( document.querySelector("[data-vue=post-list]") ) {
       }
     },
     created: function() {
+
+      if( window.sessionStorage.getItem(`post-list-filter_${this.postTypeID}`) ) {
+        this.filterForm = JSON.parse(window.sessionStorage.getItem(`post-list-filter_${this.postTypeID}`));
+      }
+
       this.fetchInfo();
       this.fetchUsers();
       this.fetchCategories();

@@ -399,6 +399,61 @@ if( document.querySelector("[data-vue=post-editor]") ) {
         }
 
       },
+      archivePost() {
+        if( this.data.id == 'new' ){ return; }
+
+        let confirm = window.confirm("Tem certeza que deseja arquivar este artigo?");
+        if(!confirm){ return; }
+
+        let confirmB = window.prompt('Digite "arquivar" para continuar:');
+        if(!confirmB || confirmB.toLowerCase() != 'arquivar'){ 
+          this.$toast.info("Arquivamento cancelado.");
+          return; 
+        }
+
+
+        this.isProcessing = true;
+
+        let _self = this;
+
+        this.$http.put(`/rest/article/${this.data.id}/archive`)
+          .then( res => {
+            this.savedLocalDataAction('discard');
+            window.location = `/articles/${this.postTypeID}`;
+          })
+          .catch(err => {
+            this.$toast.error("Erro ao tentar arquivar.");
+            console.error(err);
+          })
+          .then(() => {
+            this.isProcessing = false;
+          });
+      },
+      unarchivePost() {
+        if( this.data.id == 'new' ){ return; }
+
+        let confirm = window.confirm("Este artigo voltará como rascunho, deseja continuar?");
+        if(!confirm){ return; }
+
+        this.$http.put(`/rest/article/${this.data.id}/unarchive`)
+          .then( res => {
+            this.savedLocalDataAction('discard');
+          })
+          .catch(err => {
+            console.log(err);
+            this.$toast.error("Erro ao tentar recuperar item.");
+            console.error(err);
+          })
+          .then(() => {
+            this.isProcessing = false;
+            this.fetchInfo();
+          });
+
+      },
+      openLog() {
+        if( this.data.id == 'new' ){ return; }
+        Modal.open("LOG", { type: "ARTICLE", target: this.data.id });
+      }
     },
     created: function() {
       this.fetchCategories();

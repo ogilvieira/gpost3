@@ -3,7 +3,7 @@ const SuccessModel = require('../../core/models/SuccessModel');
 const TaxonomyModel = require('../../core/models/TaxonomyModel');
 const ArticleAreaModel = require('../../core/models/ArticleAreaModel');
 const CustomFieldModel = require('../../core/models/CustomFieldModel');
-const { PostTypeSchema, Sequelize } = require('../../core/schemas');
+const { PostTypeSchema, LogSchema, Sequelize } = require('../../core/schemas');
 
 /**
  * @route GET /rest/posttype/{id}
@@ -60,6 +60,8 @@ exports.update = async (data, req, res, next) => {
     delete articleArea.id;
 
     let response = await PostTypeSchema.update(articleArea, { where: { id: id, system: 'ARTICLE' }});
+
+    await LogSchema.create({ user: data.userData.id, action: 'UPDATE', target: id, type: 'POSTTYPE' });
 
     return res.send(new SuccessModel("PostType atualizado com sucesso."));
   } catch (err) {

@@ -126,6 +126,10 @@ if( document.querySelector("[data-vue=user-edit]") ) {
       setScore: function() {
         this.score = scorePassword(this.form.password);
       },
+      openLog() {
+        if(this.MODE == 'new'){ return; }
+        Modal.open("LOG", { type: "USER", target: this.userID });
+      }
     },
     created: function() {
 

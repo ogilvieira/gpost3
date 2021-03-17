@@ -2,7 +2,7 @@ const AuthModel = require('../../core/models/AuthModel');
 const ErrorModel = require('../../core/models/ErrorModel');
 const SuccessModel = require('../../core/models/SuccessModel');
 const UserModel = require('../../core/models/UserModel');
-const { UserSchema } = require('../../core/schemas');
+const { UserSchema, LogSchema } = require('../../core/schemas');
 
 /**
  * @route GET /rest/account
@@ -37,6 +37,9 @@ exports.update = async (data, req, res, next) => {
 
   try {
     userUpdated = await UserSchema.update(user, { where: { id: data.userData.id } })
+    
+    await LogSchema.create({ user: data.userData.id, action: 'UPDATE', target: user.id, type: 'USER' });
+
   } catch ( err ) {
     return res.status(500).send(new ErrorModel());
   }
@@ -104,6 +107,7 @@ exports.updatePassword = async (data, req, res, next) => {
   
   try {
    updatedPass = UserSchema.update({ password: pass }, { where: { id: data.userData.id }});
+   await LogSchema.create({ user: data.userData.id, action: 'UPDATE', target: data.userData.id, type: 'USER' });
   } catch ( err ) {
     return res.status(500).send(new ErrorModel());
   }

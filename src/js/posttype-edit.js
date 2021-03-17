@@ -179,6 +179,10 @@ if( document.querySelector("[data-vue=posttype-edit]") ) {
           .then(res => {
             this.isProcessing = false;
           });
+      },
+      openLog() {
+        if(this.MODE == 'new') { return; }
+        Modal.open("LOG", { type: "POSTTYPE", target: this.areaID });
       }
     },
     created: function() {

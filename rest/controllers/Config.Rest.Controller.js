@@ -1,7 +1,7 @@
 const ErrorModel = require('../../core/models/ErrorModel');
 const SuccessModel = require('../../core/models/SuccessModel');
 const ConfigModel = require('../../core/models/ConfigModel');
-const { ConfigSchema } = require('../../core/schemas');
+const { ConfigSchema, LogSchema } = require('../../core/schemas');
 /**
  * @route GET /rest/config
  * @group Config
@@ -48,6 +48,11 @@ exports.update = async (data, req, res, next) => {
 
   try {
     await ConfigSchema.update(config, { where: { id: req.params.id }});
+
+
+    await LogSchema.create({ user: data.userData.id, action: 'UPDATE', target: req.params.id, type: 'CONFIG' });
+
+
     return res.send(new SuccessModel("Configuração atualizado com sucesso."));
   } catch (err) {
     

@@ -101,6 +101,9 @@ if( document.querySelector("[data-vue=banner-edit]") ) {
       setScore: function() {
         this.score = scorePassword(this.form.password);
       },
+      openLog() {
+        Modal.open("LOG", { type: "BANNER_AREA", target: this.bannerID });
+      }
     },
     created: function() {
 

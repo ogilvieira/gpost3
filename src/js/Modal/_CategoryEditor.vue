@@ -175,6 +175,7 @@ module.exports = {
       this.$toast.error('postTypeID is required.');
       console.error('postTypeID is required.');
       this.$emit("close");
+      return;
     }
 
     this.fetch();

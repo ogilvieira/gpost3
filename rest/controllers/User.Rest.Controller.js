@@ -1,7 +1,7 @@
 const ErrorModel = require('../../core/models/ErrorModel');
 const SuccessModel = require('../../core/models/SuccessModel');
 const UserModel = require('../../core/models/UserModel');
-const { UserSchema, Sequelize } = require('../../core/schemas');
+const { UserSchema, LogSchema, Sequelize } = require('../../core/schemas');
 const AuthModel = require('../../core/models/AuthModel');
 
 /**
@@ -154,6 +154,9 @@ exports.update = async (data, req, res, next) => {
 
   try {
     var user = await UserSchema.update(newUserData, { where: { id: id }});
+    
+    await LogSchema.create({ user: data.userData.id, action: 'UPDATE', target: id, type: 'USER' });
+
     return res.send(new SuccessModel("Usuário atualizado com sucesso.", new UserModel(user)));
   } catch (err) {
     return res.status(403).send(new ErrorModel("Não foi possível atualizar o usuário."));
@@ -204,6 +207,9 @@ exports.add = async (data, req, res, next) => {
 
   try {
     var user = await UserSchema.create(newUserData);
+    
+    await LogSchema.create({ user: data.userData.id, action: 'CREATE', target: user.id, type: 'USER' });
+
     return res.send(new SuccessModel("Usuário criado com sucesso.", new UserModel(user)));
   } catch (err) {
     return res.status(403).send(new ErrorModel("Não foi possível cadastrar o usuário."));

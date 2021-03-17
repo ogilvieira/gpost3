@@ -52,10 +52,15 @@
             </div>
           </div>
           <div class="column has-text-right">
+            <button class="button is-small" v-bind:class="{'is-loading' : isProcessing }" v-on:click="openLog(config.id)"><i class="fa fa-list-alt mr-1"></i> Log</button>
+
             <button class="button is-small is-success" v-on:click="updateKey($event, config)" type="button" :disabled="userInfo && userInfo.role == 'editor' || isProcessing" v-bind:class="{'is-loading' : isProcessing }">
               <i class="mr-2 fas fa-save"></i>
               <span>Salvar</span>
             </button>
+
+
+
           </div>
         </div>  
       </div>

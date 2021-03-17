@@ -6,7 +6,10 @@
     <div class="columns">
 
       <div class="column has-text-right">
-        <button class="button is-success" v-bind:class="{'is-loading' : isProcessing }" :disabled="JSON.stringify(itemsRaw) == JSON.stringify(items) || isProcessing" v-on:click="save()">
+
+        <button class="button is-small" v-bind:class="{'is-loading' : isProcessing }" v-on:click="openLog()"><i class="fa fa-list-alt mr-1"></i> Log</button>
+
+        <button class="button is-success is-small" v-bind:class="{'is-loading' : isProcessing }" :disabled="JSON.stringify(itemsRaw) == JSON.stringify(items) || isProcessing" v-on:click="save()">
           <span class="icon">
             <i class="fas fa-save"></i>
           </span>
@@ -16,6 +19,7 @@
         <div class="mt-2" v-if="JSON.stringify(itemsRaw) != JSON.stringify(items)">
           <a href="javascript:void(0);" v-on:click="discard()"><i class="fas fa-trash"></i> Descartar alterações </a>
         </div>
+
       </div>
     </div>
 

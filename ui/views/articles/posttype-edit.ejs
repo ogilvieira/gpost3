@@ -39,12 +39,14 @@
         </div>
 
         <div class="column has-text-right">
-          <button type="button" class="button is-success" v-bind:class="{'is-loading' : isProcessing }" :disabled="!loaded || JSON.stringify(formRef) == JSON.stringify(form)" v-on:click="save()">
+          <button class="button is-small" v-bind:class="{'is-loading' : isProcessing }" v-on:click="openLog()"><i class="fa fa-list-alt mr-1"></i> Log</button>
+          <button type="button" class="button is-success is-small" v-bind:class="{'is-loading' : isProcessing }" :disabled="!loaded || JSON.stringify(formRef) == JSON.stringify(form)" v-on:click="save()">
             <span class="icon">
               <i class="fas fa-check"></i>
             </span>
             <span>Salvar</span>
           </button>
+
         </div>
       </div>
 
