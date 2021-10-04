@@ -198,7 +198,7 @@ exports.getFeatured = async (req, res, next) => {
   } catch( err ) {
 
     let models = {}
-    if(err.errors) {
+    if(err && err.errors) {
       err.errors.map(a => {
         models[a.path] = a.message;
       });
